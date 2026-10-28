@@ -1,8 +1,11 @@
 # Port plan — the old NeetCode 150 curriculum to the new contract
 
-Status: **phase 5 complete.** P5-A (evaluator core), P5-B (content and manifest), P5-C
-(reviewer) and P5-D (integration and runbook) have landed. This document is the inventory
-and the mapping; [`parity-report.md`](parity-report.md) is the parity record and
+Status: **phase 5 complete; P6 setup and reviewer config landed.** P5-A (evaluator core),
+P5-B (content and manifest), P5-C (reviewer) and P5-D (integration and runbook) have
+landed. P6-A/B unified the engine on one provider, one `DOJO_API_KEY` and one
+`settings.toml`; P6-C moved the reviewer onto that same config and key; P6-D refreshed the
+documentation. This document is the inventory and the mapping;
+[`parity-report.md`](parity-report.md) is the parity record and
 [`runbook.md`](runbook.md) is the manual end-to-end test guide.
 
 ## 1. Source
@@ -91,6 +94,15 @@ and evidence untouched. A stopped or malformed agent prints `review unavailable`
 attempt survives. The agent never sees the assessment tree, hidden cases, references or
 history.
 
+The reviewer has no configuration or key of its own. It reads the engine's one
+`$DOJO_CONFIG_DIR/settings.toml` (or the engine's XDG default
+`~/.config/dojo/settings.toml`) and the one `DOJO_API_KEY`. `[llm].provider`/`model`/
+`base_url` select the model path, and `[curricula."neetcode-150".reviewer].model`
+optionally overrides the model for the reviewer alone. `DOJO_REVIEWER_*`, `OPENAI_*` and
+the provider-specific key variables are gone; they are not fallbacks. With no key, no
+settings file or `provider = "mock"`, the deterministic rubric is the review and no model
+call is made.
+
 ## 5. The agent roster
 
 | capability | implementation | why |
@@ -139,15 +151,33 @@ P5-D completed the new-server half and the engine integration (2026-10-27):
 - `encode_and_decode_strings` exercised the predicate checker end to end (26/26 private
   cases), and `valid_palindrome` exercised a measured item whose complexity evidence was
   `partial` (advisory for the default grade).
-- The tutor/teacher/hint flow ran on `provider = "mock"`; with no LLM key the agents
-  reported unavailable while practice continued; a blocking leak-auditor verdict withheld
-  the answer and kept the hint level.
+- The tutor/teacher/hint flow ran on `provider = "mock"`. Under the P6 setup gate a live
+  provider without a key stops before a session instead of degrading mid-session, and
+  `mock` needs no key; a blocking leak-auditor verdict withheld the answer and kept the
+  hint level.
 - The failure paths held: reviewer down at enrollment failed cleanly and enrolled nothing;
   reviewer stopped after enrollment left the attempt, grade and card intact and printed
   `review unavailable`; `unenroll` kept history.
 - The full 157-item catalog is available to the engine (all statements/workspaces
   resolved); a full 157 submission run was not repeated because the item corpus and
   assessment registration are covered by the offline suite and the enrollment loader.
+
+P6-D refreshed the setup, credentials, reviewer and test documentation (2026-10-28):
+
+- The engine's first-run wizard writes one `settings.toml` (provider, optional base URL,
+  the provider's default model, editor) and exports the one `DOJO_API_KEY` in the shell rc
+  in a marked, backed-up block. A key-only step handles an existing config without a key;
+  `--no-setup`, `DOJO_NO_SETUP` and non-TTY runs fail actionably; `--help`/`--version`
+  never run setup.
+- The reviewer reads the same `settings.toml` and `DOJO_API_KEY`;
+  `[curricula."neetcode-150".reviewer].model` is its only override. No
+  `DOJO_REVIEWER_*`/`OPENAI_*` or provider-specific key variable remains.
+- Checks: curriculum 373 (223 + 150), engine 565, reference agent 17; `ruff check`,
+  `ruff format --check` and `ty check` clean (the engine's only formatting complaint is
+  the pre-existing `docs/phase-2.md` Markdown block).
+- The runbook covers the first-run/key-only/mock flows, the one settings file, the
+  reviewer's deterministic and model modes, the practice/A2A session, the failure paths,
+  the full-corpus counts (157 corpus, 152 active, 5 retired), data/privacy and cleanup.
 
 ## 8. Risks and decisions
 
@@ -172,8 +202,15 @@ P5-D completed the new-server half and the engine integration (2026-10-27):
 - **Dependencies.** The curriculum pins its own runtime (`a2a-sdk`, `mcp`, `pydantic`,
   `radon`, `uvicorn`); dojo does not install curriculum dependencies. The README and
   runbook document `uv sync`.
+- **One config and one key.** The engine and the reviewer share one `settings.toml` and one
+  `DOJO_API_KEY`. There is no username, no per-provider key and no reviewer key. The setup
+  wizard exports the key in the shell rc; it stays out of the settings file, the database,
+  the review view and the MCP child environment. `DOJO_EDITOR` overrides
+  `[editor].command`; `$EDITOR`/`$VISUAL` are not read.
 - **Reviewer lifecycle.** The reviewer must be started by the user before enrollment and
-  kept up for reviews. dojo fails closed at enrollment and degrades gracefully at submit.
+  kept up for reviews. It reads the same config/key as the engine, so both processes must
+  be pointed at the same `settings.toml`; dojo fails closed at enrollment and degrades
+  gracefully at submit.
 
 ## 9. Milestones
 
@@ -185,5 +222,6 @@ P5-D completed the new-server half and the engine integration (2026-10-27):
 | 5d | A2A reviewer + prompts + hint policy | done |
 | 5e | integration: enrollment, representative items, runbook | done |
 
-The phase-6 cutover (backup, rename, force-push, fresh database) is separate and
-destructive; the phase-5 runbook is its gate.
+The P6-A/B setup, P6-C reviewer config and P6-D documentation packages are complete. The
+phase-6 cutover (backup, rename, force-push, fresh database) is separate and destructive;
+the P6-D runbook is its gate.
