@@ -53,12 +53,15 @@ The manifest targets dojo `>=0.1,<1` with `assessment.v1` and `review.v1`:
   declared for the grader but deliberately not attached to item `evaluators`.
 - `[capabilities.assist/instruct/audit]` are declarative LLM prompts; `[capabilities.review]`
   is `impl = "a2a"` pointing at `[agents.reviewer]`, `http://127.0.0.1:8766/`, skill
-  `review` (the P6-C agent in `reviewer/`).
+  `review` (the P6-C agent in `reviewer/`). `[capabilities.discuss]` is the optional
+  post-solve reviewer conversation (`prompts/discussion.md`).
 
 The reviewer sees exactly the review view — statement, submitted files, evidence, grade
 and claims — never the assessment tree, hidden cases, references or history. The review
 is advisory: it is stored with `provider = "a2a"` provenance and never changes the grade,
-card or evidence.
+card or evidence. After submit, the same reviewer agent answers follow-ups in discussion
+mode; `polish` returns to the editor and a second submit records another attempt. `done`
+ends the session. `dojo history` lists numbered attempts and `dojo show <n>` shows one.
 
 ## Set up, start the reviewer and enrol
 
@@ -121,7 +124,7 @@ uv run ty check .
 ```
 
 The curriculum and reviewer suites are offline: no network, no API key and no bound port.
-The engine's 588 tests and the reference A2A agent's 17 tests are run from `../rebuild`
+The engine's 593 tests and the reference A2A agent's 17 tests are run from `../rebuild`
 (the engine's one A2A integration test binds loopback 8765). `ty` excludes only the
 copied `content/` corpus and `src/neetcode_dojo/assessment/` (verbatim private content);
 the evaluator core, server, prompts, tests and reviewer are all type-checked.
@@ -147,7 +150,7 @@ the evaluator core, server, prompts, tests and reviewer are all type-checked.
   predicate cases through the ported checker. See
   [`docs/parity-report.md`](docs/parity-report.md).
 - **Checks:** curriculum `pytest` 375 (224 + 151), `ruff check`, `ruff format --check` and
-  `ty check` clean; engine 588 tests and the same checks clean (the only engine formatting
+  `ty check` clean; engine 593 tests and the same checks clean (the only engine formatting
   complaint is a pre-existing Markdown code block in its read-only `docs/phase-2.md`).
 
 Requires `uv >= 0.13` and Python 3.15. The phase-6 cutover is a separate, destructive

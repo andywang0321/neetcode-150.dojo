@@ -232,16 +232,17 @@ def test_every_evaluator_reference_resolves(manifest: dict) -> None:
 
 def test_capabilities_and_agents(manifest: dict) -> None:
     capabilities = manifest["capabilities"]
-    assert set(capabilities) == {"assist", "instruct", "audit", "review"}
+    assert set(capabilities) == {"assist", "instruct", "audit", "review", "discuss"}
     for name, prompt in (
         ("assist", "prompts/tutor.md"),
         ("instruct", "prompts/teacher.md"),
         ("audit", "prompts/leak.md"),
+        ("discuss", "prompts/discussion.md"),
     ):
         capability = capabilities[name]
         assert capability["impl"] == "llm"
         assert capability["prompt"] == prompt
-        assert capability["model"] in {"tutor", "teacher", "auditor"}
+        assert capability["model"] in {"tutor", "teacher", "auditor", "reviewer"}
         assert (ROOT / prompt).is_file()
     assert capabilities["assist"]["hint_policy"] == "policies/hints.toml"
     assert (ROOT / "policies/hints.toml").is_file()
