@@ -121,7 +121,7 @@ uv run ty check .
 ```
 
 The curriculum and reviewer suites are offline: no network, no API key and no bound port.
-The engine's 565 tests and the reference A2A agent's 17 tests are run from `../rebuild`
+The engine's 579 tests and the reference A2A agent's 17 tests are run from `../rebuild`
 (the engine's one A2A integration test binds loopback 8765). `ty` excludes only the
 copied `content/` corpus and `src/neetcode_dojo/assessment/` (verbatim private content);
 the evaluator core, server, prompts, tests and reviewer are all type-checked.
@@ -147,7 +147,7 @@ the evaluator core, server, prompts, tests and reviewer are all type-checked.
   predicate cases through the ported checker. See
   [`docs/parity-report.md`](docs/parity-report.md).
 - **Checks:** curriculum `pytest` 373 (223 + 150), `ruff check`, `ruff format --check` and
-  `ty check` clean; engine 565 tests and the same checks clean (the only engine formatting
+  `ty check` clean; engine 579 tests and the same checks clean (the only engine formatting
   complaint is a pre-existing Markdown code block in its read-only `docs/phase-2.md`).
 
 Requires `uv >= 0.13` and Python 3.15. The phase-6 cutover is a separate, destructive
