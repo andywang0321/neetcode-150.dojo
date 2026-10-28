@@ -21,8 +21,8 @@ def build_app(
     """Build the app; the arguments exist so tests and the server can inject pieces.
 
     `model=None` means a fully deterministic review. The tests construct the app that
-    way (or with a recording fake), so the suite never reads an API key or opens a socket.
-    The real entry point passes `model_from_env()`.
+    way (or with a recording fake), so the suite never reads a key or opens a socket.
+    The real entry point passes `model_from_environment()`.
     """
     card = agent_card or build_agent_card()
     handler = DefaultRequestHandler(
