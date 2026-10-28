@@ -131,8 +131,9 @@ def test_the_stdio_server_starts_and_lists_its_tools(tmp_path: Path) -> None:
     async def scenario() -> Any:
         async with Client(parameters, read_timeout_seconds=30.0) as client:
             listing = await client.list_tools()
-            # An item with no assessment module behind the default store is an
-            # error *result*, not a server crash.
+            # The merged curriculum has a real assessment module for this item,
+            # so the server must return a real result. A missing module is an
+            # error *result* and is covered by the evaluator unit tests.
             call = await client.call_tool(
                 "assess.tests", {"request": request_for("valid_parentheses")}
             )
@@ -141,4 +142,4 @@ def test_the_stdio_server_starts_and_lists_its_tools(tmp_path: Path) -> None:
     listing, call = _run(scenario())
     assert {tool.name for tool in listing.tools} == set(TOOL_NAMES)
     result = AssessmentResult.model_validate(call.structured_content)
-    assert result.outcome == "error"
+    assert result.outcome == "pass"

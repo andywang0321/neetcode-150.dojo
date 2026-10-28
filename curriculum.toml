@@ -1,0 +1,1928 @@
+[dojo]
+format = 1
+engine = ">=0.1,<1"
+id = "neetcode-150"
+title = "NeetCode 150"
+version = "0.1.0"
+source = "github.com/lufftw/neetcode (community mirror of LeetCode 150)"
+license = "private"
+contracts = ["assessment.v1", "review.v1"]
+
+[display]
+topic = "Pattern"
+item = "Problem"
+outline = "Roadmap"
+difficulty = ["Easy", "Medium", "Hard"]
+
+[server]
+command = ["uv", "run", "--project", ".", "python", "-m", "neetcode_dojo.server"]
+transport = "stdio"
+
+[[evaluator]]
+id = "tests"
+tool = "assess.tests"
+assurance = "machine"
+required = true
+timeout = 60
+
+[[evaluator]]
+id = "oracle"
+tool = "assess.oracle"
+assurance = "machine"
+required = false
+timeout = 60
+
+[[evaluator]]
+id = "complexity"
+tool = "assess.complexity"
+assurance = "measured"
+required = false
+timeout = 180
+
+[[evaluator]]
+id = "style"
+tool = "assess.style"
+assurance = "machine"
+required = false
+timeout = 60
+
+[[evaluator]]
+id = "variant"
+tool = "variant"
+assurance = "self"
+required = false
+timeout = 60
+
+[[evaluator]]
+id = "grade"
+tool = "grade"
+assurance = "judged"
+required = false
+timeout = 60
+
+[[topic]]
+id = "arrays_and_hashing"
+title = "Arrays & Hashing"
+summary = "9 ladder problems in this pattern, 10 of them curated so far."
+prereqs = []
+
+[[topic]]
+id = "two_pointers"
+title = "Two Pointers"
+summary = "5 ladder problems in this pattern, 5 of them curated so far."
+prereqs = ["arrays_and_hashing"]
+
+[[topic]]
+id = "sliding_window"
+title = "Sliding Window"
+summary = "6 ladder problems in this pattern, 6 of them curated so far."
+prereqs = ["two_pointers"]
+
+[[topic]]
+id = "stack"
+title = "Stack"
+summary = "7 ladder problems in this pattern, 7 of them curated so far."
+prereqs = ["sliding_window"]
+
+[[topic]]
+id = "binary_search"
+title = "Binary Search"
+summary = "7 ladder problems in this pattern, 8 of them curated so far."
+prereqs = ["stack"]
+
+[[topic]]
+id = "linked_list"
+title = "Linked List"
+summary = "11 ladder problems in this pattern, 11 of them curated so far."
+prereqs = ["binary_search"]
+
+[[topic]]
+id = "trees"
+title = "Trees"
+summary = "15 ladder problems in this pattern, 16 of them curated so far."
+prereqs = ["linked_list"]
+
+[[topic]]
+id = "tries"
+title = "Tries"
+summary = "3 ladder problems in this pattern, 3 of them curated so far."
+prereqs = ["trees"]
+
+[[topic]]
+id = "heap"
+title = "Heap / Priority Queue"
+summary = "7 ladder problems in this pattern, 8 of them curated so far."
+prereqs = ["tries"]
+
+[[topic]]
+id = "backtracking"
+title = "Backtracking"
+summary = "9 ladder problems in this pattern, 9 of them curated so far."
+prereqs = ["heap"]
+
+[[topic]]
+id = "graphs"
+title = "Graphs"
+summary = "13 ladder problems in this pattern, 13 of them curated so far."
+prereqs = ["backtracking"]
+
+[[topic]]
+id = "advanced_graphs"
+title = "Advanced Graphs"
+summary = "6 ladder problems in this pattern, 6 of them curated so far."
+prereqs = ["graphs"]
+
+[[topic]]
+id = "dp_1d"
+title = "1-D Dynamic Programming"
+summary = "12 ladder problems in this pattern, 12 of them curated so far."
+prereqs = ["advanced_graphs"]
+
+[[topic]]
+id = "dp_2d"
+title = "2-D Dynamic Programming"
+summary = "11 ladder problems in this pattern, 12 of them curated so far."
+prereqs = ["dp_1d"]
+
+[[topic]]
+id = "greedy"
+title = "Greedy"
+summary = "8 ladder problems in this pattern, 9 of them curated so far."
+prereqs = ["dp_2d"]
+
+[[topic]]
+id = "intervals"
+title = "Intervals"
+summary = "6 ladder problems in this pattern, 6 of them curated so far."
+prereqs = ["greedy"]
+
+[[topic]]
+id = "math_and_geometry"
+title = "Math & Geometry"
+summary = "8 ladder problems in this pattern, 9 of them curated so far."
+prereqs = ["intervals"]
+
+[[topic]]
+id = "bit_manipulation"
+title = "Bit Manipulation"
+summary = "7 ladder problems in this pattern, 7 of them curated so far."
+prereqs = ["math_and_geometry"]
+
+[[item]]
+id = "contains_duplicate"
+topic = "arrays_and_hashing"
+title = "Contains Duplicate"
+difficulty = "Easy"
+external_id = "217"
+statement = "content/contains_duplicate/statement.md"
+workspace = "content/contains_duplicate/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "valid_anagram"
+topic = "arrays_and_hashing"
+title = "Valid Anagram"
+difficulty = "Easy"
+external_id = "242"
+statement = "content/valid_anagram/statement.md"
+workspace = "content/valid_anagram/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "two_sum"
+topic = "arrays_and_hashing"
+title = "Two Sum"
+difficulty = "Easy"
+external_id = "1"
+statement = "content/two_sum/statement.md"
+workspace = "content/two_sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "group_anagrams"
+topic = "arrays_and_hashing"
+title = "Group Anagrams"
+difficulty = "Medium"
+external_id = "49"
+statement = "content/group_anagrams/statement.md"
+workspace = "content/group_anagrams/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "top_k_frequent_elements"
+topic = "arrays_and_hashing"
+title = "Top K Frequent Elements"
+difficulty = "Medium"
+external_id = "347"
+statement = "content/top_k_frequent_elements/statement.md"
+workspace = "content/top_k_frequent_elements/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "products_of_array_except_self"
+topic = "arrays_and_hashing"
+title = "Products of Array Except Self"
+difficulty = "Medium"
+external_id = "238"
+statement = "content/products_of_array_except_self/statement.md"
+workspace = "content/products_of_array_except_self/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "valid_sudoku"
+topic = "arrays_and_hashing"
+title = "Valid Sudoku"
+difficulty = "Medium"
+external_id = "36"
+statement = "content/valid_sudoku/statement.md"
+workspace = "content/valid_sudoku/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "longest_consecutive_sequence"
+topic = "arrays_and_hashing"
+title = "Longest Consecutive Sequence"
+difficulty = "Medium"
+external_id = "128"
+statement = "content/longest_consecutive_sequence/statement.md"
+workspace = "content/longest_consecutive_sequence/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "encode_and_decode_strings"
+topic = "arrays_and_hashing"
+title = "Encode and Decode Strings"
+difficulty = "Medium"
+external_id = "271"
+statement = "content/encode_and_decode_strings/statement.md"
+workspace = "content/encode_and_decode_strings/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "style"]
+
+[[item]]
+id = "array_intersection"
+topic = "arrays_and_hashing"
+title = "Array Intersection"
+difficulty = "Easy"
+external_id = "349"
+retired = true
+statement = "content/array_intersection/statement.md"
+workspace = "content/array_intersection/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "valid_palindrome"
+topic = "two_pointers"
+title = "Valid Palindrome"
+difficulty = "Easy"
+external_id = "125"
+statement = "content/valid_palindrome/statement.md"
+workspace = "content/valid_palindrome/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "two_sum_2"
+topic = "two_pointers"
+title = "Two Integer Sum II"
+difficulty = "Medium"
+external_id = "167"
+statement = "content/two_sum_2/statement.md"
+workspace = "content/two_sum_2/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "three_sum"
+topic = "two_pointers"
+title = "Three Sum"
+difficulty = "Medium"
+external_id = "15"
+statement = "content/three_sum/statement.md"
+workspace = "content/three_sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "container_with_most_water"
+topic = "two_pointers"
+title = "Container With Most Water"
+difficulty = "Medium"
+external_id = "11"
+statement = "content/container_with_most_water/statement.md"
+workspace = "content/container_with_most_water/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "trapping_rain_water"
+topic = "two_pointers"
+title = "Trapping Rain Water"
+difficulty = "Hard"
+external_id = "42"
+statement = "content/trapping_rain_water/statement.md"
+workspace = "content/trapping_rain_water/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "best-time-to-buy-and-sell-stock"
+topic = "sliding_window"
+title = "Best Time to Buy and Sell Stock"
+difficulty = "Easy"
+external_id = "121"
+statement = "content/best-time-to-buy-and-sell-stock/statement.md"
+workspace = "content/best-time-to-buy-and-sell-stock/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-substring-without-repeating-characters"
+topic = "sliding_window"
+title = "Longest Substring Without Repeating Characters"
+difficulty = "Medium"
+external_id = "3"
+statement = "content/longest-substring-without-repeating-characters/statement.md"
+workspace = "content/longest-substring-without-repeating-characters/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-repeating-character-replacement"
+topic = "sliding_window"
+title = "Longest Repeating Character Replacement"
+difficulty = "Medium"
+external_id = "424"
+statement = "content/longest-repeating-character-replacement/statement.md"
+workspace = "content/longest-repeating-character-replacement/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "permutation-in-string"
+topic = "sliding_window"
+title = "Permutation in String"
+difficulty = "Medium"
+external_id = "567"
+statement = "content/permutation-in-string/statement.md"
+workspace = "content/permutation-in-string/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "minimum-window-substring"
+topic = "sliding_window"
+title = "Minimum Window Substring"
+difficulty = "Hard"
+external_id = "76"
+statement = "content/minimum-window-substring/statement.md"
+workspace = "content/minimum-window-substring/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "sliding-window-maximum"
+topic = "sliding_window"
+title = "Sliding Window Maximum"
+difficulty = "Hard"
+external_id = "239"
+statement = "content/sliding-window-maximum/statement.md"
+workspace = "content/sliding-window-maximum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "valid_parentheses"
+topic = "stack"
+title = "Valid Parentheses"
+difficulty = "Easy"
+external_id = "20"
+statement = "content/valid_parentheses/statement.md"
+workspace = "content/valid_parentheses/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "min_stack"
+topic = "stack"
+title = "Minimum Stack"
+difficulty = "Medium"
+external_id = "155"
+statement = "content/min_stack/statement.md"
+workspace = "content/min_stack/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "evaluate_reverse_polish_notation"
+topic = "stack"
+title = "Evaluate Reverse Polish Notation"
+difficulty = "Medium"
+external_id = "150"
+statement = "content/evaluate_reverse_polish_notation/statement.md"
+workspace = "content/evaluate_reverse_polish_notation/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "generate_parentheses"
+topic = "stack"
+title = "Generate Parentheses"
+difficulty = "Medium"
+external_id = "22"
+statement = "content/generate_parentheses/statement.md"
+workspace = "content/generate_parentheses/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "daily_temperatures"
+topic = "stack"
+title = "Daily Temperatures"
+difficulty = "Medium"
+external_id = "739"
+statement = "content/daily_temperatures/statement.md"
+workspace = "content/daily_temperatures/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "car_fleet"
+topic = "stack"
+title = "Car Fleet"
+difficulty = "Medium"
+external_id = "853"
+statement = "content/car_fleet/statement.md"
+workspace = "content/car_fleet/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "largest_rectangle_in_histogram"
+topic = "stack"
+title = "Largest Rectangle In Histogram"
+difficulty = "Hard"
+external_id = "84"
+statement = "content/largest_rectangle_in_histogram/statement.md"
+workspace = "content/largest_rectangle_in_histogram/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "binary-search"
+topic = "binary_search"
+title = "Binary Search"
+difficulty = "Easy"
+external_id = "704"
+statement = "content/binary-search/statement.md"
+workspace = "content/binary-search/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "search-a-2d-matrix"
+topic = "binary_search"
+title = "Search a 2D Matrix"
+difficulty = "Medium"
+external_id = "74"
+statement = "content/search-a-2d-matrix/statement.md"
+workspace = "content/search-a-2d-matrix/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "koko-eating-bananas"
+topic = "binary_search"
+title = "Koko Eating Bananas"
+difficulty = "Medium"
+external_id = "875"
+statement = "content/koko-eating-bananas/statement.md"
+workspace = "content/koko-eating-bananas/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "search-in-rotated-sorted-array"
+topic = "binary_search"
+title = "Search in Rotated Sorted Array"
+difficulty = "Medium"
+external_id = "33"
+statement = "content/search-in-rotated-sorted-array/statement.md"
+workspace = "content/search-in-rotated-sorted-array/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "find-minimum-in-rotated-sorted-array"
+topic = "binary_search"
+title = "Find Minimum in Rotated Sorted Array"
+difficulty = "Medium"
+external_id = "153"
+statement = "content/find-minimum-in-rotated-sorted-array/statement.md"
+workspace = "content/find-minimum-in-rotated-sorted-array/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "time-based-key-value-store"
+topic = "binary_search"
+title = "Time Based Key-Value Store"
+difficulty = "Medium"
+external_id = "981"
+statement = "content/time-based-key-value-store/statement.md"
+workspace = "content/time-based-key-value-store/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "median-of-two-sorted-arrays"
+topic = "binary_search"
+title = "Median of Two Sorted Arrays"
+difficulty = "Hard"
+external_id = "4"
+statement = "content/median-of-two-sorted-arrays/statement.md"
+workspace = "content/median-of-two-sorted-arrays/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "peak_elements"
+topic = "binary_search"
+title = "Find a Peak Element"
+difficulty = "Medium"
+external_id = "162"
+retired = true
+statement = "content/peak_elements/statement.md"
+workspace = "content/peak_elements/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "reverse-linked-list"
+topic = "linked_list"
+title = "Reverse Linked List"
+difficulty = "Easy"
+external_id = "206"
+statement = "content/reverse-linked-list/statement.md"
+workspace = "content/reverse-linked-list/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "merge-two-sorted-lists"
+topic = "linked_list"
+title = "Merge Two Sorted Lists"
+difficulty = "Easy"
+external_id = "21"
+statement = "content/merge-two-sorted-lists/statement.md"
+workspace = "content/merge-two-sorted-lists/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "reorder-list"
+topic = "linked_list"
+title = "Reorder List"
+difficulty = "Medium"
+external_id = "143"
+statement = "content/reorder-list/statement.md"
+workspace = "content/reorder-list/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "remove-nth-node-from-end-of-list"
+topic = "linked_list"
+title = "Remove Nth Node From End of List"
+difficulty = "Medium"
+external_id = "19"
+statement = "content/remove-nth-node-from-end-of-list/statement.md"
+workspace = "content/remove-nth-node-from-end-of-list/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "copy-list-with-random-pointer"
+topic = "linked_list"
+title = "Copy List with Random Pointer"
+difficulty = "Medium"
+external_id = "138"
+statement = "content/copy-list-with-random-pointer/statement.md"
+workspace = "content/copy-list-with-random-pointer/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "add-two-numbers"
+topic = "linked_list"
+title = "Add Two Numbers"
+difficulty = "Medium"
+external_id = "2"
+statement = "content/add-two-numbers/statement.md"
+workspace = "content/add-two-numbers/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "linked-list-cycle"
+topic = "linked_list"
+title = "Linked List Cycle"
+difficulty = "Easy"
+external_id = "141"
+statement = "content/linked-list-cycle/statement.md"
+workspace = "content/linked-list-cycle/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "find-the-duplicate-number"
+topic = "linked_list"
+title = "Find the Duplicate Number"
+difficulty = "Medium"
+external_id = "287"
+statement = "content/find-the-duplicate-number/statement.md"
+workspace = "content/find-the-duplicate-number/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "lru-cache"
+topic = "linked_list"
+title = "LRU Cache"
+difficulty = "Medium"
+external_id = "146"
+statement = "content/lru-cache/statement.md"
+workspace = "content/lru-cache/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "merge-k-sorted-lists"
+topic = "linked_list"
+title = "Merge k Sorted Lists"
+difficulty = "Hard"
+external_id = "23"
+statement = "content/merge-k-sorted-lists/statement.md"
+workspace = "content/merge-k-sorted-lists/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "reverse-nodes-in-k-group"
+topic = "linked_list"
+title = "Reverse Nodes in k-Group"
+difficulty = "Hard"
+external_id = "25"
+statement = "content/reverse-nodes-in-k-group/statement.md"
+workspace = "content/reverse-nodes-in-k-group/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "invert-binary-tree"
+topic = "trees"
+title = "Invert Binary Tree"
+difficulty = "Easy"
+external_id = "226"
+statement = "content/invert-binary-tree/statement.md"
+workspace = "content/invert-binary-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "maximum-depth-of-binary-tree"
+topic = "trees"
+title = "Maximum Depth of Binary Tree"
+difficulty = "Easy"
+external_id = "104"
+statement = "content/maximum-depth-of-binary-tree/statement.md"
+workspace = "content/maximum-depth-of-binary-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "binary_tree_diameter"
+topic = "trees"
+title = "Binary Tree Diameter"
+difficulty = "Medium"
+external_id = "543"
+statement = "content/binary_tree_diameter/statement.md"
+workspace = "content/binary_tree_diameter/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "balanced-binary-tree"
+topic = "trees"
+title = "Balanced Binary Tree"
+difficulty = "Easy"
+external_id = "110"
+statement = "content/balanced-binary-tree/statement.md"
+workspace = "content/balanced-binary-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "same-tree"
+topic = "trees"
+title = "Same Tree"
+difficulty = "Easy"
+external_id = "100"
+statement = "content/same-tree/statement.md"
+workspace = "content/same-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "subtree-of-another-tree"
+topic = "trees"
+title = "Subtree of Another Tree"
+difficulty = "Easy"
+external_id = "572"
+statement = "content/subtree-of-another-tree/statement.md"
+workspace = "content/subtree-of-another-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "lowest-common-ancestor-of-a-binary-search-tree"
+topic = "trees"
+title = "Lowest Common Ancestor of a Binary Search Tree"
+difficulty = "Medium"
+external_id = "235"
+statement = "content/lowest-common-ancestor-of-a-binary-search-tree/statement.md"
+workspace = "content/lowest-common-ancestor-of-a-binary-search-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "binary-tree-level-order-traversal"
+topic = "trees"
+title = "Binary Tree Level Order Traversal"
+difficulty = "Medium"
+external_id = "102"
+statement = "content/binary-tree-level-order-traversal/statement.md"
+workspace = "content/binary-tree-level-order-traversal/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "binary-tree-right-side-view"
+topic = "trees"
+title = "Binary Tree Right Side View"
+difficulty = "Medium"
+external_id = "199"
+statement = "content/binary-tree-right-side-view/statement.md"
+workspace = "content/binary-tree-right-side-view/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "count-good-nodes-in-binary-tree"
+topic = "trees"
+title = "Count Good Nodes in Binary Tree"
+difficulty = "Medium"
+external_id = "1448"
+statement = "content/count-good-nodes-in-binary-tree/statement.md"
+workspace = "content/count-good-nodes-in-binary-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "validate-binary-search-tree"
+topic = "trees"
+title = "Validate Binary Search Tree"
+difficulty = "Medium"
+external_id = "98"
+statement = "content/validate-binary-search-tree/statement.md"
+workspace = "content/validate-binary-search-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "kth-smallest-element-in-a-bst"
+topic = "trees"
+title = "Kth Smallest Element in a BST"
+difficulty = "Medium"
+external_id = "230"
+statement = "content/kth-smallest-element-in-a-bst/statement.md"
+workspace = "content/kth-smallest-element-in-a-bst/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "construct-binary-tree-from-preorder-and-inorder-traversal"
+topic = "trees"
+title = "Construct Binary Tree from Preorder and Inorder Traversal"
+difficulty = "Medium"
+external_id = "105"
+statement = "content/construct-binary-tree-from-preorder-and-inorder-traversal/statement.md"
+workspace = "content/construct-binary-tree-from-preorder-and-inorder-traversal/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "binary-tree-maximum-path-sum"
+topic = "trees"
+title = "Binary Tree Maximum Path Sum"
+difficulty = "Hard"
+external_id = "124"
+statement = "content/binary-tree-maximum-path-sum/statement.md"
+workspace = "content/binary-tree-maximum-path-sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "serialize-and-deserialize-binary-tree"
+topic = "trees"
+title = "Serialize and Deserialize Binary Tree"
+difficulty = "Hard"
+external_id = "297"
+statement = "content/serialize-and-deserialize-binary-tree/statement.md"
+workspace = "content/serialize-and-deserialize-binary-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "mirror_image_binary_tree"
+topic = "trees"
+title = "Symmetric Binary Tree"
+difficulty = "Easy"
+external_id = "101"
+retired = true
+statement = "content/mirror_image_binary_tree/statement.md"
+workspace = "content/mirror_image_binary_tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "implement-trie-prefix-tree"
+topic = "tries"
+title = "Implement Trie (Prefix Tree)"
+difficulty = "Medium"
+external_id = "208"
+statement = "content/implement-trie-prefix-tree/statement.md"
+workspace = "content/implement-trie-prefix-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "design-add-and-search-words-data-structure"
+topic = "tries"
+title = "Design Add and Search Words Data Structure"
+difficulty = "Medium"
+external_id = "211"
+statement = "content/design-add-and-search-words-data-structure/statement.md"
+workspace = "content/design-add-and-search-words-data-structure/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "word-search-ii"
+topic = "tries"
+title = "Word Search II"
+difficulty = "Hard"
+external_id = "212"
+statement = "content/word-search-ii/statement.md"
+workspace = "content/word-search-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "kth-largest-element-in-a-stream"
+topic = "heap"
+title = "Kth Largest Element in a Stream"
+difficulty = "Easy"
+external_id = "703"
+statement = "content/kth-largest-element-in-a-stream/statement.md"
+workspace = "content/kth-largest-element-in-a-stream/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "last-stone-weight"
+topic = "heap"
+title = "Last Stone Weight"
+difficulty = "Easy"
+external_id = "1046"
+statement = "content/last-stone-weight/statement.md"
+workspace = "content/last-stone-weight/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "k-closest-points-to-origin"
+topic = "heap"
+title = "K Closest Points to Origin"
+difficulty = "Medium"
+external_id = "973"
+statement = "content/k-closest-points-to-origin/statement.md"
+workspace = "content/k-closest-points-to-origin/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "kth-largest-element-in-an-array"
+topic = "heap"
+title = "Kth Largest Element in an Array"
+difficulty = "Medium"
+external_id = "215"
+statement = "content/kth-largest-element-in-an-array/statement.md"
+workspace = "content/kth-largest-element-in-an-array/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "task-scheduler"
+topic = "heap"
+title = "Task Scheduler"
+difficulty = "Medium"
+external_id = "621"
+statement = "content/task-scheduler/statement.md"
+workspace = "content/task-scheduler/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "design-twitter"
+topic = "heap"
+title = "Design Twitter"
+difficulty = "Medium"
+external_id = "355"
+statement = "content/design-twitter/statement.md"
+workspace = "content/design-twitter/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "find-median-from-data-stream"
+topic = "heap"
+title = "Find Median from Data Stream"
+difficulty = "Hard"
+external_id = "295"
+statement = "content/find-median-from-data-stream/statement.md"
+workspace = "content/find-median-from-data-stream/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "k_smallest_elem_matrix"
+topic = "heap"
+title = "Kth Smallest Element in a Sorted Matrix"
+difficulty = "Easy"
+external_id = "378"
+retired = true
+statement = "content/k_smallest_elem_matrix/statement.md"
+workspace = "content/k_smallest_elem_matrix/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "subsets"
+topic = "backtracking"
+title = "Subsets"
+difficulty = "Medium"
+external_id = "78"
+statement = "content/subsets/statement.md"
+workspace = "content/subsets/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "combination-sum"
+topic = "backtracking"
+title = "Combination Sum"
+difficulty = "Medium"
+external_id = "39"
+statement = "content/combination-sum/statement.md"
+workspace = "content/combination-sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "permutations"
+topic = "backtracking"
+title = "Permutations"
+difficulty = "Medium"
+external_id = "46"
+statement = "content/permutations/statement.md"
+workspace = "content/permutations/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "subsets-ii"
+topic = "backtracking"
+title = "Subsets II"
+difficulty = "Medium"
+external_id = "90"
+statement = "content/subsets-ii/statement.md"
+workspace = "content/subsets-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "combination-sum-ii"
+topic = "backtracking"
+title = "Combination Sum II"
+difficulty = "Medium"
+external_id = "40"
+statement = "content/combination-sum-ii/statement.md"
+workspace = "content/combination-sum-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "word-search"
+topic = "backtracking"
+title = "Word Search"
+difficulty = "Medium"
+external_id = "79"
+statement = "content/word-search/statement.md"
+workspace = "content/word-search/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "palindrome-partitioning"
+topic = "backtracking"
+title = "Palindrome Partitioning"
+difficulty = "Medium"
+external_id = "131"
+statement = "content/palindrome-partitioning/statement.md"
+workspace = "content/palindrome-partitioning/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "letter-combinations-of-a-phone-number"
+topic = "backtracking"
+title = "Letter Combinations of a Phone Number"
+difficulty = "Medium"
+external_id = "17"
+statement = "content/letter-combinations-of-a-phone-number/statement.md"
+workspace = "content/letter-combinations-of-a-phone-number/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "n-queens"
+topic = "backtracking"
+title = "N-Queens"
+difficulty = "Hard"
+external_id = "51"
+statement = "content/n-queens/statement.md"
+workspace = "content/n-queens/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "number-of-islands"
+topic = "graphs"
+title = "Number of Islands"
+difficulty = "Medium"
+external_id = "200"
+statement = "content/number-of-islands/statement.md"
+workspace = "content/number-of-islands/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "clone-graph"
+topic = "graphs"
+title = "Clone Graph"
+difficulty = "Medium"
+external_id = "133"
+statement = "content/clone-graph/statement.md"
+workspace = "content/clone-graph/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "max-area-of-island"
+topic = "graphs"
+title = "Max Area of Island"
+difficulty = "Medium"
+external_id = "695"
+statement = "content/max-area-of-island/statement.md"
+workspace = "content/max-area-of-island/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "pacific-atlantic-water-flow"
+topic = "graphs"
+title = "Pacific Atlantic Water Flow"
+difficulty = "Medium"
+external_id = "417"
+statement = "content/pacific-atlantic-water-flow/statement.md"
+workspace = "content/pacific-atlantic-water-flow/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "surrounded-regions"
+topic = "graphs"
+title = "Surrounded Regions"
+difficulty = "Medium"
+external_id = "130"
+statement = "content/surrounded-regions/statement.md"
+workspace = "content/surrounded-regions/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "rotting-oranges"
+topic = "graphs"
+title = "Rotting Oranges"
+difficulty = "Medium"
+external_id = "994"
+statement = "content/rotting-oranges/statement.md"
+workspace = "content/rotting-oranges/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "walls-and-gates"
+topic = "graphs"
+title = "Walls and Gates"
+difficulty = "Medium"
+external_id = "286"
+statement = "content/walls-and-gates/statement.md"
+workspace = "content/walls-and-gates/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "course-schedule"
+topic = "graphs"
+title = "Course Schedule"
+difficulty = "Medium"
+external_id = "207"
+statement = "content/course-schedule/statement.md"
+workspace = "content/course-schedule/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "course-schedule-ii"
+topic = "graphs"
+title = "Course Schedule II"
+difficulty = "Medium"
+external_id = "210"
+statement = "content/course-schedule-ii/statement.md"
+workspace = "content/course-schedule-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "redundant-connection"
+topic = "graphs"
+title = "Redundant Connection"
+difficulty = "Medium"
+external_id = "684"
+statement = "content/redundant-connection/statement.md"
+workspace = "content/redundant-connection/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "number-of-connected-components-in-an-undirected-graph"
+topic = "graphs"
+title = "Number of Connected Components in an Undirected Graph"
+difficulty = "Medium"
+external_id = "323"
+statement = "content/number-of-connected-components-in-an-undirected-graph/statement.md"
+workspace = "content/number-of-connected-components-in-an-undirected-graph/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "graph-valid-tree"
+topic = "graphs"
+title = "Graph Valid Tree"
+difficulty = "Medium"
+external_id = "261"
+statement = "content/graph-valid-tree/statement.md"
+workspace = "content/graph-valid-tree/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "word-ladder"
+topic = "graphs"
+title = "Word Ladder"
+difficulty = "Hard"
+external_id = "127"
+statement = "content/word-ladder/statement.md"
+workspace = "content/word-ladder/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "reconstruct-itinerary"
+topic = "advanced_graphs"
+title = "Reconstruct Itinerary"
+difficulty = "Hard"
+external_id = "332"
+statement = "content/reconstruct-itinerary/statement.md"
+workspace = "content/reconstruct-itinerary/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "min-cost-to-connect-all-points"
+topic = "advanced_graphs"
+title = "Min Cost to Connect All Points"
+difficulty = "Medium"
+external_id = "1584"
+statement = "content/min-cost-to-connect-all-points/statement.md"
+workspace = "content/min-cost-to-connect-all-points/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "network-delay-time"
+topic = "advanced_graphs"
+title = "Network Delay Time"
+difficulty = "Medium"
+external_id = "743"
+statement = "content/network-delay-time/statement.md"
+workspace = "content/network-delay-time/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "swim-in-rising-water"
+topic = "advanced_graphs"
+title = "Swim in Rising Water"
+difficulty = "Hard"
+external_id = "778"
+statement = "content/swim-in-rising-water/statement.md"
+workspace = "content/swim-in-rising-water/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "alien-dictionary"
+topic = "advanced_graphs"
+title = "Alien Dictionary"
+difficulty = "Hard"
+external_id = "269"
+statement = "content/alien-dictionary/statement.md"
+workspace = "content/alien-dictionary/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "cheapest-flights-within-k-stops"
+topic = "advanced_graphs"
+title = "Cheapest Flights Within K Stops"
+difficulty = "Medium"
+external_id = "787"
+statement = "content/cheapest-flights-within-k-stops/statement.md"
+workspace = "content/cheapest-flights-within-k-stops/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "climbing-stairs"
+topic = "dp_1d"
+title = "Climbing Stairs"
+difficulty = "Easy"
+external_id = "70"
+statement = "content/climbing-stairs/statement.md"
+workspace = "content/climbing-stairs/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "min-cost-climbing-stairs"
+topic = "dp_1d"
+title = "Min Cost Climbing Stairs"
+difficulty = "Easy"
+external_id = "746"
+statement = "content/min-cost-climbing-stairs/statement.md"
+workspace = "content/min-cost-climbing-stairs/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "house-robber"
+topic = "dp_1d"
+title = "House Robber"
+difficulty = "Medium"
+external_id = "198"
+statement = "content/house-robber/statement.md"
+workspace = "content/house-robber/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "house-robber-ii"
+topic = "dp_1d"
+title = "House Robber II"
+difficulty = "Medium"
+external_id = "213"
+statement = "content/house-robber-ii/statement.md"
+workspace = "content/house-robber-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-palindromic-substring"
+topic = "dp_1d"
+title = "Longest Palindromic Substring"
+difficulty = "Medium"
+external_id = "5"
+statement = "content/longest-palindromic-substring/statement.md"
+workspace = "content/longest-palindromic-substring/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "palindromic-substrings"
+topic = "dp_1d"
+title = "Palindromic Substrings"
+difficulty = "Medium"
+external_id = "647"
+statement = "content/palindromic-substrings/statement.md"
+workspace = "content/palindromic-substrings/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "decode-ways"
+topic = "dp_1d"
+title = "Decode Ways"
+difficulty = "Medium"
+external_id = "91"
+statement = "content/decode-ways/statement.md"
+workspace = "content/decode-ways/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "coin-change"
+topic = "dp_1d"
+title = "Coin Change"
+difficulty = "Medium"
+external_id = "322"
+statement = "content/coin-change/statement.md"
+workspace = "content/coin-change/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "maximum-product-subarray"
+topic = "dp_1d"
+title = "Maximum Product Subarray"
+difficulty = "Medium"
+external_id = "152"
+statement = "content/maximum-product-subarray/statement.md"
+workspace = "content/maximum-product-subarray/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "word-break"
+topic = "dp_1d"
+title = "Word Break"
+difficulty = "Medium"
+external_id = "139"
+statement = "content/word-break/statement.md"
+workspace = "content/word-break/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-increasing-subsequence"
+topic = "dp_1d"
+title = "Longest Increasing Subsequence"
+difficulty = "Medium"
+external_id = "300"
+statement = "content/longest-increasing-subsequence/statement.md"
+workspace = "content/longest-increasing-subsequence/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "partition-equal-subset-sum"
+topic = "dp_1d"
+title = "Partition Equal Subset Sum"
+difficulty = "Medium"
+external_id = "416"
+statement = "content/partition-equal-subset-sum/statement.md"
+workspace = "content/partition-equal-subset-sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "unique-paths"
+topic = "dp_2d"
+title = "Unique Paths"
+difficulty = "Medium"
+external_id = "62"
+statement = "content/unique-paths/statement.md"
+workspace = "content/unique-paths/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "interleaving-string"
+topic = "dp_2d"
+title = "Interleaving String"
+difficulty = "Medium"
+external_id = "97"
+statement = "content/interleaving-string/statement.md"
+workspace = "content/interleaving-string/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-common-subsequence"
+topic = "dp_2d"
+title = "Longest Common Subsequence"
+difficulty = "Medium"
+external_id = "1143"
+statement = "content/longest-common-subsequence/statement.md"
+workspace = "content/longest-common-subsequence/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "best-time-to-buy-and-sell-stock-with-cooldown"
+topic = "dp_2d"
+title = "Best Time to Buy and Sell Stock with Cooldown"
+difficulty = "Medium"
+external_id = "309"
+statement = "content/best-time-to-buy-and-sell-stock-with-cooldown/statement.md"
+workspace = "content/best-time-to-buy-and-sell-stock-with-cooldown/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "target-sum"
+topic = "dp_2d"
+title = "Target Sum"
+difficulty = "Medium"
+external_id = "494"
+statement = "content/target-sum/statement.md"
+workspace = "content/target-sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "coin-change-ii"
+topic = "dp_2d"
+title = "Coin Change II"
+difficulty = "Medium"
+external_id = "518"
+statement = "content/coin-change-ii/statement.md"
+workspace = "content/coin-change-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "edit-distance"
+topic = "dp_2d"
+title = "Edit Distance"
+difficulty = "Medium"
+external_id = "72"
+statement = "content/edit-distance/statement.md"
+workspace = "content/edit-distance/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "longest-increasing-path-in-a-matrix"
+topic = "dp_2d"
+title = "Longest Increasing Path in a Matrix"
+difficulty = "Hard"
+external_id = "329"
+statement = "content/longest-increasing-path-in-a-matrix/statement.md"
+workspace = "content/longest-increasing-path-in-a-matrix/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "distinct-subsequences"
+topic = "dp_2d"
+title = "Distinct Subsequences"
+difficulty = "Hard"
+external_id = "115"
+statement = "content/distinct-subsequences/statement.md"
+workspace = "content/distinct-subsequences/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "burst-balloons"
+topic = "dp_2d"
+title = "Burst Balloons"
+difficulty = "Hard"
+external_id = "312"
+statement = "content/burst-balloons/statement.md"
+workspace = "content/burst-balloons/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "regular-expression-matching"
+topic = "dp_2d"
+title = "Regular Expression Matching"
+difficulty = "Hard"
+external_id = "10"
+statement = "content/regular-expression-matching/statement.md"
+workspace = "content/regular-expression-matching/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "generate_sample_to_target_sum"
+topic = "dp_2d"
+title = "Generate Sample Summing to a Target"
+difficulty = "Medium"
+statement = "content/generate_sample_to_target_sum/statement.md"
+workspace = "content/generate_sample_to_target_sum/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "style"]
+
+[[item]]
+id = "sum_largest_contiguous_subarray"
+topic = "greedy"
+title = "Maximum Subarray Sum"
+difficulty = "Easy"
+external_id = "53"
+statement = "content/sum_largest_contiguous_subarray/statement.md"
+workspace = "content/sum_largest_contiguous_subarray/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "jump-game"
+topic = "greedy"
+title = "Jump Game"
+difficulty = "Medium"
+external_id = "55"
+statement = "content/jump-game/statement.md"
+workspace = "content/jump-game/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "jump-game-ii"
+topic = "greedy"
+title = "Jump Game II"
+difficulty = "Medium"
+external_id = "45"
+statement = "content/jump-game-ii/statement.md"
+workspace = "content/jump-game-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "gas-station"
+topic = "greedy"
+title = "Gas Station"
+difficulty = "Medium"
+external_id = "134"
+statement = "content/gas-station/statement.md"
+workspace = "content/gas-station/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "hand-of-straights"
+topic = "greedy"
+title = "Hand of Straights"
+difficulty = "Medium"
+external_id = "846"
+statement = "content/hand-of-straights/statement.md"
+workspace = "content/hand-of-straights/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "merge-triplets-to-form-target-triplet"
+topic = "greedy"
+title = "Merge Triplets to Form Target Triplet"
+difficulty = "Medium"
+external_id = "1899"
+statement = "content/merge-triplets-to-form-target-triplet/statement.md"
+workspace = "content/merge-triplets-to-form-target-triplet/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "partition-labels"
+topic = "greedy"
+title = "Partition Labels"
+difficulty = "Medium"
+external_id = "763"
+statement = "content/partition-labels/statement.md"
+workspace = "content/partition-labels/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "valid-parenthesis-string"
+topic = "greedy"
+title = "Valid Parenthesis String"
+difficulty = "Medium"
+external_id = "678"
+statement = "content/valid-parenthesis-string/statement.md"
+workspace = "content/valid-parenthesis-string/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "max_prod_3_nums"
+topic = "greedy"
+title = "Maximum Product of Three Numbers"
+difficulty = "Easy"
+external_id = "628"
+retired = true
+statement = "content/max_prod_3_nums/statement.md"
+workspace = "content/max_prod_3_nums/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "insert-interval"
+topic = "intervals"
+title = "Insert Interval"
+difficulty = "Medium"
+external_id = "57"
+statement = "content/insert-interval/statement.md"
+workspace = "content/insert-interval/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "merge-intervals"
+topic = "intervals"
+title = "Merge Intervals"
+difficulty = "Medium"
+external_id = "56"
+statement = "content/merge-intervals/statement.md"
+workspace = "content/merge-intervals/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "non-overlapping-intervals"
+topic = "intervals"
+title = "Non-overlapping Intervals"
+difficulty = "Medium"
+external_id = "435"
+statement = "content/non-overlapping-intervals/statement.md"
+workspace = "content/non-overlapping-intervals/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "meeting-rooms"
+topic = "intervals"
+title = "Meeting Rooms"
+difficulty = "Easy"
+external_id = "252"
+statement = "content/meeting-rooms/statement.md"
+workspace = "content/meeting-rooms/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "meeting-rooms-ii"
+topic = "intervals"
+title = "Meeting Rooms II"
+difficulty = "Medium"
+external_id = "253"
+statement = "content/meeting-rooms-ii/statement.md"
+workspace = "content/meeting-rooms-ii/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "minimum-interval-to-include-each-query"
+topic = "intervals"
+title = "Minimum Interval to Include Each Query"
+difficulty = "Hard"
+external_id = "1851"
+statement = "content/minimum-interval-to-include-each-query/statement.md"
+workspace = "content/minimum-interval-to-include-each-query/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "rotate-image"
+topic = "math_and_geometry"
+title = "Rotate Image"
+difficulty = "Medium"
+external_id = "48"
+statement = "content/rotate-image/statement.md"
+workspace = "content/rotate-image/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "spiral-matrix"
+topic = "math_and_geometry"
+title = "Spiral Matrix"
+difficulty = "Medium"
+external_id = "54"
+statement = "content/spiral-matrix/statement.md"
+workspace = "content/spiral-matrix/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "set-matrix-zeroes"
+topic = "math_and_geometry"
+title = "Set Matrix Zeroes"
+difficulty = "Medium"
+external_id = "73"
+statement = "content/set-matrix-zeroes/statement.md"
+workspace = "content/set-matrix-zeroes/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "happy-number"
+topic = "math_and_geometry"
+title = "Happy Number"
+difficulty = "Easy"
+external_id = "202"
+statement = "content/happy-number/statement.md"
+workspace = "content/happy-number/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "plus-one"
+topic = "math_and_geometry"
+title = "Plus One"
+difficulty = "Easy"
+external_id = "66"
+statement = "content/plus-one/statement.md"
+workspace = "content/plus-one/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "powx-n"
+topic = "math_and_geometry"
+title = "Pow(x, n)"
+difficulty = "Medium"
+external_id = "50"
+statement = "content/powx-n/statement.md"
+workspace = "content/powx-n/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "multiply-strings"
+topic = "math_and_geometry"
+title = "Multiply Strings"
+difficulty = "Medium"
+external_id = "43"
+statement = "content/multiply-strings/statement.md"
+workspace = "content/multiply-strings/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "detect-squares"
+topic = "math_and_geometry"
+title = "Detect Squares"
+difficulty = "Medium"
+external_id = "2013"
+statement = "content/detect-squares/statement.md"
+workspace = "content/detect-squares/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "correlation"
+topic = "math_and_geometry"
+title = "Correlation Coefficient"
+difficulty = "Medium"
+statement = "content/correlation/statement.md"
+workspace = "content/correlation/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "single-number"
+topic = "bit_manipulation"
+title = "Single Number"
+difficulty = "Easy"
+external_id = "136"
+statement = "content/single-number/statement.md"
+workspace = "content/single-number/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "number-of-1-bits"
+topic = "bit_manipulation"
+title = "Number of 1 Bits"
+difficulty = "Easy"
+external_id = "191"
+statement = "content/number-of-1-bits/statement.md"
+workspace = "content/number-of-1-bits/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "counting-bits"
+topic = "bit_manipulation"
+title = "Counting Bits"
+difficulty = "Easy"
+external_id = "338"
+statement = "content/counting-bits/statement.md"
+workspace = "content/counting-bits/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "reverse-bits"
+topic = "bit_manipulation"
+title = "Reverse Bits"
+difficulty = "Easy"
+external_id = "190"
+statement = "content/reverse-bits/statement.md"
+workspace = "content/reverse-bits/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "missing-number"
+topic = "bit_manipulation"
+title = "Missing Number"
+difficulty = "Easy"
+external_id = "268"
+statement = "content/missing-number/statement.md"
+workspace = "content/missing-number/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "complexity", "style"]
+
+[[item]]
+id = "sum-of-two-integers"
+topic = "bit_manipulation"
+title = "Sum of Two Integers"
+difficulty = "Medium"
+external_id = "371"
+statement = "content/sum-of-two-integers/statement.md"
+workspace = "content/sum-of-two-integers/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[[item]]
+id = "reverse-integer"
+topic = "bit_manipulation"
+title = "Reverse Integer"
+difficulty = "Medium"
+external_id = "7"
+statement = "content/reverse-integer/statement.md"
+workspace = "content/reverse-integer/workspace"
+check = ["python", "check.py"]
+evaluators = ["tests", "oracle", "style"]
+
+[agents.reviewer]
+url = "http://127.0.0.1:8766/"
+
+[capabilities.assist]
+impl = "llm"
+prompt = "prompts/tutor.md"
+model = "tutor"
+hint_policy = "policies/hints.toml"
+
+[capabilities.instruct]
+impl = "llm"
+prompt = "prompts/teacher.md"
+model = "teacher"
+
+[capabilities.audit]
+impl = "llm"
+prompt = "prompts/leak.md"
+model = "auditor"
+
+[capabilities.review]
+impl = "a2a"
+agent = "reviewer"
+skill = "review"
+
+[aliases]
+# The old curriculum's ids are the new ids; no rename is implied.
+topics = {}
+items = {}

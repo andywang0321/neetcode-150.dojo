@@ -1,0 +1,33 @@
+"""Visible checks for `three_sum` — the student runs these.
+
+Shipped to the student and rendered into their workbench, so they check the
+statement's promises and nothing more. The verdict that counts comes from the
+oracle and its generated cases, which are quarantined in `assessment/`.
+"""
+
+CASES = [
+    {'args': [[-1, 0, 1, 2, -1, -4]],
+     'expected': [[-1, -1, 2], [-1, 0, 1]],
+     'compare': 'sorted'},
+    {'args': [[0, 1, 1]], 'expected': [], 'compare': 'sorted'},
+    {'args': [[0, 0, 0]], 'expected': [[0, 0, 0]], 'compare': 'sorted'},
+]
+
+
+def check() -> None:
+    from solution import three_sum
+
+    checked = 0
+    for number, case in enumerate(CASES, 1):
+        got = three_sum(*case["args"])
+        if case.get("compare") == "sorted":
+            ok = sorted(map(repr, got)) == sorted(map(repr, case["expected"]))
+        else:
+            ok = got == case["expected"]
+        assert ok, f"case {number}: got {got!r}, want {case['expected']!r}"
+        checked += 1
+    print(f"{checked} of {len(CASES)} visible checks passed")
+
+
+if __name__ == "__main__":
+    check()
