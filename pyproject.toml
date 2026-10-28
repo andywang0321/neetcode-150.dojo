@@ -1,5 +1,5 @@
 [project]
-name = "dojo-curriculum-neetcode-150"
+name = "neetcode-150.dojo"
 version = "0.1.0"
 description = "The NeetCode 150 as a dojo curriculum."
 readme = "README.md"

@@ -1,7 +1,9 @@
-# dojo-curriculum-neetcode-150
+# neetcode-150.dojo
 
 The NeetCode 150 as a **dojo curriculum**: 18 patterns and 157 problems, the 150 ladder
 rungs in roadmap order plus seven of dojo's own curated problems.
+
+The repository follows dojo's curriculum convention: `<curriculum-id>.dojo`.
 
 This repository is the **rebuild** of the old `dojo-curriculum-neetcode-150` against the
 new dojo contract. It is a scaffold today; the content, the evaluators and the reviewer
