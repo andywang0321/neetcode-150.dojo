@@ -38,5 +38,11 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "C4"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "reviewer/tests"]
 addopts = "-q --strict-markers"
+
+[tool.ty.src]
+# The copied curriculum corpus and its private assessment modules are content, not new
+# typed package code. They are kept verbatim for parity and excluded from the type
+# checker; the evaluator core, server, tests, prompts and reviewer are all checked.
+exclude = ["content", "src/neetcode_dojo/assessment"]

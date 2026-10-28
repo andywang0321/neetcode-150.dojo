@@ -206,18 +206,18 @@ From the repository root:
 ```bash
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
 uv sync
-uv run pytest                      # the repository's own tests
-uv run pytest reviewer/tests       # the reviewer suite
+uv run pytest                      # both suites (curriculum tests + reviewer)
+uv run pytest reviewer/tests       # the reviewer suite only (123 tests)
 uv run ruff check .
 uv run ruff format --check .
 uv run ty check .
 ```
 
-The repository root's pytest config collects only `tests/`, so the reviewer suite is
-invoked explicitly with `reviewer/tests`. The package carries its own pytest/ruff
-configuration in `reviewer/pyproject.toml`; it deliberately has no second virtualenv or
-lockfile, and uses the repository's approved `a2a-sdk[fastapi]`, `pydantic` and
-`uvicorn` environment.
+The repository root's pytest config includes both `tests/` and `reviewer/tests/`, so a
+single `uv run pytest` runs the evaluator/content suite and this suite. The package
+carries its own pytest/ruff configuration in `reviewer/pyproject.toml` for running it
+standalone; it deliberately has no second virtualenv or lockfile, and uses the
+repository's approved `a2a-sdk[fastapi]`, `pydantic` and `uvicorn` environment.
 
 ## Layout
 

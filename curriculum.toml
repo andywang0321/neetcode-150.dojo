@@ -37,12 +37,12 @@ id = "complexity"
 tool = "assess.complexity"
 assurance = "measured"
 required = false
-timeout = 180
+timeout = 300
 
 [[evaluator]]
 id = "style"
 tool = "assess.style"
-assurance = "machine"
+assurance = "judged"
 required = false
 timeout = 60
 
