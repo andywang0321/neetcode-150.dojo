@@ -247,7 +247,12 @@ def test_capabilities_and_agents(manifest: dict) -> None:
 
     review = capabilities["review"]
     assert review == {"impl": "a2a", "agent": "reviewer", "skill": "review"}
-    assert manifest["agents"] == {"reviewer": {"url": "http://127.0.0.1:8766/"}}
+    assert manifest["agents"] == {
+        "reviewer": {
+            "url": "http://127.0.0.1:8766/",
+            "command": ["uv", "run", "--project", ".", "python", "-m", "reviewer.server"],
+        }
+    }
 
     # Renames are declarations, not implications. The port kept every id stable.
     assert manifest["aliases"] == {"topics": {}, "items": {}}

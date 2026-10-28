@@ -72,8 +72,10 @@ own evidence): `tests`/`oracle` are `machine`, `complexity` is `measured`, `styl
 
 One real A2A agent in `reviewer/`, built on `a2a-sdk[fastapi]`, with one `review` skill.
 It serves the card at `http://127.0.0.1:8766/.well-known/agent-card.json` and JSON-RPC at
-`http://127.0.0.1:8766/`. dojo never starts it; the user runs `uv run python -m
-reviewer.server` and stops it with Ctrl-C.
+`http://127.0.0.1:8766/`. The manifest's `command` lets dojo start it on demand; the user
+does not run a separate reviewer terminal in normal use. For debugging,
+`uv run python -m reviewer.server` from the repository root still works; stop it with
+Ctrl-C.
 
 It receives the `review.v1` review view — statement, submitted files, evaluator evidence,
 grade and claims — and returns `ReviewResult`:

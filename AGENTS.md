@@ -56,8 +56,10 @@ workbench code lives here, not in the engine.
   workspace. Do not commit `.venv`, caches or generated files.
 - The approved dependencies are the engine's phase-5 set: `pydantic`, `mcp`, `radon`,
   `a2a-sdk[fastapi]`, `uvicorn`; no new dependency without the orchestrator.
-- The A2A reviewer is a separate process: `uv run python -m reviewer.server` from the
-  repository root. dojo never starts or stops it; the runbook covers the exact commands.
+- The A2A reviewer is declared in `curriculum.toml` with a `command`; dojo probes the
+  card, starts the command in the repository root when needed, and stops it on exit. Run
+  `uv run python -m reviewer.server` directly only for debugging; the runbook covers the
+  normal `dojo` flow.
 
 ## 4. Branch protocol
 

@@ -3,8 +3,9 @@
     uv run python -m reviewer.server
 
 It serves the agent card and the A2A JSON-RPC endpoint on 127.0.0.1:8766. The engine
-discovers the card at `/.well-known/agent-card.json`; dojo never spawns the agent, so
-keep this process running for enrollment and review. Stop it with Ctrl-C.
+discovers the card at `/.well-known/agent-card.json` and, in normal use, starts this
+module itself from the manifest command and stops it when dojo exits. Run it directly only
+for debugging; stop it with Ctrl-C.
 
 The optional model is resolved once at startup from the one dojo `settings.toml` and
 `DOJO_API_KEY`. A missing key/config/model keeps the deterministic review; a malformed

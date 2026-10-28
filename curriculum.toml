@@ -1900,6 +1900,7 @@ evaluators = ["tests", "oracle", "style"]
 
 [agents.reviewer]
 url = "http://127.0.0.1:8766/"
+command = ["uv", "run", "--project", ".", "python", "-m", "reviewer.server"]
 
 [capabilities.assist]
 impl = "llm"
