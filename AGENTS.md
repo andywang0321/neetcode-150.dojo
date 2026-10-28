@@ -41,8 +41,8 @@ workbench code lives here, not in the engine.
 ## 3. Toolchain
 
 - Python 3.15 via `uv`; `uv sync` for dependencies, `uv run` for everything.
-- `uv run pytest` runs both suites (`tests/` and `reviewer/tests/`; 373 tests today:
-  223 + 150). `uv run pytest tests` and `uv run pytest reviewer/tests` run one at a time.
+- `uv run pytest` runs both suites (`tests/` and `reviewer/tests/`; 375 tests today:
+  224 + 151). `uv run pytest tests` and `uv run pytest reviewer/tests` run one at a time.
 - The engine and the reviewer share one provider, one `DOJO_API_KEY` and one
   `settings.toml` (`[llm]`, `[editor]`, `[curricula.<id>]`). The engine's first-run setup
   writes the config and exports the key in the shell rc; the key is never in the file.

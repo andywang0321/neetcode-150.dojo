@@ -100,6 +100,7 @@ def test_manifest_has_the_new_shape(manifest: dict) -> None:
         "topic",
         "item",
         "agents",
+        "reflection",
         "capabilities",
         "aliases",
     }
@@ -291,3 +292,12 @@ def test_spot_check_statements_are_their_own(manifest: dict, item_id: str) -> No
     statement = (ROOT / item["statement"]).read_text(encoding="utf-8")
     assert not statement.startswith(f"{item['title']} [{item['difficulty']}]")
     assert statement.strip()
+
+
+def test_reflection_questions_cover_time_and_space(manifest: dict) -> None:
+    reflection = manifest["reflection"]
+    assert [question["id"] for question in reflection] == [
+        "time_complexity",
+        "space_complexity",
+    ]
+    assert all(question["prompt"].strip() for question in reflection)

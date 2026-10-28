@@ -634,14 +634,28 @@ Before you submit, you can run section 9's mock tutor/`learn` flow in this same 
 skip it and submit now. After a passing submit the card is scheduled in 2 days, so this
 item is not served again until it is due.
 
+Submitting first asks the curriculum's two reflection questions; the answers are the
+attempt's claims and the reviewer reads them. Answer in one line each:
+
 ```text
 dojo> submit
+╭────────────────────────── before the review · 1/2 ───────────────────────────╮
+│ Time Complexity                                                              │
+│ What is the time complexity of your solution? State the Big-O bound and      │
+│ justify it in one or two sentences.                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+dojo> O(n): one pass over nums, O(1) set membership per value.
+╭────────────────────────── before the review · 2/2 ───────────────────────────╮
+│ Space Complexity                                                             │
+│ What is the space complexity of your solution? State the Big-O bound and     │
+│ justify it in one or two sentences.                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+dojo> O(n): the set can hold every distinct value.
 ```
 
 Expected evidence and grade (timings and the last decimals vary):
 
 ```text
-dojo> submit
 ╭────────────────────────────────── evidence ──────────────────────────────────╮
 │ evaluator   assurance   outcome   summary                                    │
 │ tests       machine     pass      26/26 private cases passed                 │
@@ -664,7 +678,9 @@ dojo> submit
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
-The review block is the deterministic P6-C rubric from section 6.1. In model mode
+The two answers are the attempt's `claims`. The deterministic rubric flags a claim that
+is looser than the measured pattern bound or contradicted by the complexity evidence; the
+model reviewer gets the same claims and is asked to compare them. In model mode
 (section 6.2) the summary/strengths prose is model-written and varies; the `quality`
 value still comes from the rubric, and the grade, card and evidence are untouched.
 
@@ -677,7 +693,7 @@ import sqlite3, sys
 db = sqlite3.connect(sys.argv[1])
 db.row_factory = sqlite3.Row
 for sql in (
-    "select item_id, grade, outcome from attempts",
+    "select item_id, grade, outcome, claims_json from attempts",
     "select evaluator_id, assurance, outcome from evidence order by evaluator_id",
     "select item_id, reps, stability, difficulty from cards",
     "select agent from reviews",
@@ -691,7 +707,8 @@ PY
 
 Expected:
 
-- one `attempts` row, `contains_duplicate`, grade 3, outcome `pass`;
+- one `attempts` row, `contains_duplicate`, grade 3, outcome `pass`, and a
+  `claims_json` containing `time_complexity` and `space_complexity`;
 - four `evidence` rows (in evaluator-id order): `complexity`/`measured`/`pass`,
   `oracle`/`machine`/`pass`, `style`/`judged`/`pass`, `tests`/`machine`/`pass`;
 - one `cards` row, reps 1, next review in 2 days (FSRS);
@@ -1025,9 +1042,9 @@ From the curriculum checkout:
 cd "$CURRICULUM"
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
 uv sync
-uv run pytest                 # 373: 223 curriculum + 150 reviewer
-uv run pytest tests           # 223
-uv run pytest reviewer/tests  # 150
+uv run pytest                 # 375: 224 curriculum + 151 reviewer
+uv run pytest tests           # 224
+uv run pytest reviewer/tests  # 151
 uv run ruff check .
 uv run ruff format --check .
 uv run ty check .
@@ -1040,7 +1057,7 @@ From the engine checkout (read-only for P6-D):
 
 ```bash
 cd "$ENGINE"
-uv run pytest                 # 580
+uv run pytest                 # 588
 uv run ruff check .           # clean
 uv run ty check .             # clean
 uv run ruff format --check .  # see the known-issue note below
@@ -1222,7 +1239,7 @@ Privacy and the data boundary:
   command again and the review is produced.
 - With a live provider and no key, the CLI stops actionably; with `mock` the whole flow is
   offline; with no key the reviewer is deterministic.
-- The curriculum suite is 373 (223 + 150), `ruff` and `ty` are clean; the engine is 580
+- The curriculum suite is 375 (224 + 151), `ruff` and `ty` are clean; the engine is 588
   and clean apart from the pre-existing `docs/phase-2.md` formatting note; the reference
   agent is 17.
 - No private material appears in any prompt, workspace, review request or committed file.

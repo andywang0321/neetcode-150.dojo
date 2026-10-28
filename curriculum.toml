@@ -18,6 +18,14 @@ difficulty = ["Easy", "Medium", "Hard"]
 command = ["uv", "run", "--project", ".", "python", "-m", "neetcode_dojo.server"]
 transport = "stdio"
 
+[[reflection]]
+id = "time_complexity"
+prompt = "What is the time complexity of your solution? State the Big-O bound and justify it in one or two sentences."
+
+[[reflection]]
+id = "space_complexity"
+prompt = "What is the space complexity of your solution? State the Big-O bound and justify it in one or two sentences."
+
 [[evaluator]]
 id = "tests"
 tool = "assess.tests"

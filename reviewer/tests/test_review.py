@@ -147,6 +147,24 @@ def test_claim_mismatch_is_flagged() -> None:
     assert any("nested iteration" in item and "O(n)" in item for item in result.improvements)
 
 
+def test_claim_looser_than_the_measured_bound_is_flagged() -> None:
+    result = review(
+        make_request(
+            files=(SubmissionFile(path="solution.py", content=HASH_SOLUTION),),
+            evidence_items=(
+                evidence(evaluator="tests"),
+                evidence(evaluator="complexity", summary="time like the reference (1.00x)"),
+            ),
+            claims={
+                "time_complexity": "O(n^2) because of nested loops",
+                "space_complexity": "O(n)",
+            },
+        )
+    )
+
+    assert any("O(n^2)" in item and "looser" in item for item in result.improvements)
+
+
 def test_complexity_evidence_disagreement_is_flagged() -> None:
     result = review(
         make_request(

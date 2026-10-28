@@ -174,7 +174,7 @@ P6-D refreshed the setup, credentials, reviewer and test documentation (2026-10-
 - The reviewer reads the same `settings.toml` and `DOJO_API_KEY`;
   `[curricula."neetcode-150".reviewer].model` is its only override. No
   `DOJO_REVIEWER_*`/`OPENAI_*` or provider-specific key variable remains.
-- Checks: curriculum 373 (223 + 150), engine 565, reference agent 17; `ruff check`,
+- Checks: curriculum 375 (224 + 151), engine 588, reference agent 17; `ruff check`,
   `ruff format --check` and `ty check` clean (the engine's only formatting complaint is
   the pre-existing `docs/phase-2.md` Markdown block).
 - The runbook covers the first-run/key-only/mock flows, the one settings file, the
