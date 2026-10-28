@@ -1,0 +1,35 @@
+# The NeetCode tutor's hint ladder, ordered least to most revealing.
+#
+# The engine appends the current level's name and `may` text to the tutor prompt and
+# shows the same level to the leak auditor. A delivered answer advances one level
+# (capped at the last); a withheld answer does not advance; a reset marker in the
+# student's message answers at the first level.
+#
+# The old tutor had six tiers and never allowed code. This preserves that boundary:
+# even the skeleton level is an outline in words, not code or pseudocode.
+
+reset_markers = ["stuck", "no idea", "i don't know", "lost", "give up"]
+
+[[level]]
+name = "articulate the blockage"
+may = "Ask what they have already tried and where exactly the code or the reasoning stops. Do not name a technique, a data structure or an algorithm, and do not write code."
+
+[[level]]
+name = "conceptual nudge"
+may = "Name one property, constraint or invariant that matters for this problem. Do not name a technique, a data structure or an algorithm, and do not write code."
+
+[[level]]
+name = "topic recognition"
+may = "Name the pattern or topic family the exercise belongs to and why it fits. Do not describe an approach, and do not write code."
+
+[[level]]
+name = "data structure / invariant"
+may = "Name one data structure or invariant that could carry the solution and what it would let the student track. Do not give the full approach, and do not write code."
+
+[[level]]
+name = "edge cases"
+may = "Point at the edge cases or constraint boundaries the current attempt should check, and ask what happens there. Do not give the approach, and do not write code."
+
+[[level]]
+name = "skeleton (no code)"
+may = "Outline the sequence of steps in words only, leaving the implementation to the student. Never write code, pseudocode, a complete function or the final answer."

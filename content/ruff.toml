@@ -1,0 +1,4 @@
+# `content/` is the ported old corpus: statement prose, starter files and the visible
+# checks the student runs. It is copied verbatim apart from the workspace module path,
+# so it is intentionally outside the package lint/format gate. New code does not go here.
+exclude = ["**/*.py"]

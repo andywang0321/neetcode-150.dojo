@@ -1,0 +1,5 @@
+# `src/neetcode_dojo/assessment/` is the private assessment tree copied from the old
+# curriculum. It is quarantined content, not new package code: the modules keep their
+# old comments, docstrings and formatting, and only the registry import changed. The
+# new registry, server, tests and reviewer stay under the standard lint/format gate.
+exclude = ["**/*.py"]
