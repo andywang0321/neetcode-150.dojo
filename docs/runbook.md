@@ -241,13 +241,14 @@ model = "deepseek-reasoner"   # optional; the engine keeps using [llm].model
 
 It matters only when the reviewer runs in model mode (a live provider and
 `DOJO_API_KEY`); with the mock provider or no key the reviewer is deterministic and this
-table is ignored. Section 6 shows the startup line for both cases.
+table is ignored. Section 6.1/6.2 describes both cases.
 
 ### 4.4 The editor
 
-`dojo` opens the session workspace at the start of a session; `open` opens it again and
-`dojo settings` opens the settings file. The command is `[editor].command` from the one
-settings file, or `DOJO_EDITOR` for one shell:
+`dojo` never opens the editor at startup: the statement is shown first. The `open`
+command opens `solution.py` (the statement is prepended to it as a docstring, and the
+visible `check.py` is hidden under `.dojo/`); `dojo settings` opens the settings file. The
+command is `[editor].command` from the one settings file, or `DOJO_EDITOR` for one shell:
 
 ```bash
 export DOJO_EDITOR="code --wait"     # overrides [editor].command in this shell
@@ -445,22 +446,22 @@ If you do not want the editor window during the walkthrough, export
 `DOJO_EDITOR=true` (it still opens, but exits immediately) or use your normal editor.
 `dojo` prints the workspace path either way.
 
-## 6. Start the NeetCode A2A reviewer
+## 6. The NeetCode A2A reviewer
 
-The reviewer is a separate process. Terminal 1 (leave it running; stop with Ctrl-C):
+The reviewer is **not** a separate terminal any more. The curriculum declares how to
+start it; `dojo` probes the card first, starts the command in the curriculum root when it
+is missing, waits for the card, and stops the process it started when `dojo` exits. This
+happens for `dojo enroll` and for every `dojo` session. The only entrypoint is `dojo`.
 
-```bash
-cd "$CURRICULUM"
-export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
-export DOJO_CONFIG_DIR="$HOME/dojo-p6d/config"   # the same file the engine uses
-unset DOJO_API_KEY                               # deterministic mode for this walkthrough
-uv run python -m reviewer.server
-```
+```toml
+[agents.reviewer]
+url = "http://127.0.0.1:8766/"
+command = ["uv", "run", "--project", ".", "python", "-m", "reviewer.server"]
 
-Expected first line:
-
-```text
-NeetCode 150 reviewer listening on http://127.0.0.1:8766/ (deterministic, no dojo model configured)
+[capabilities.review]
+impl = "a2a"
+agent = "reviewer"
+skill = "review"
 ```
 
 The agent serves:
@@ -471,13 +472,10 @@ The agent serves:
 | A2A JSON-RPC | `POST http://127.0.0.1:8766/` (protocol v1.0, `JSONRPC` binding, `SendMessage`) |
 | skill | `review` |
 
-Verify the card and skill from another terminal:
-
-```bash
-curl -sS http://127.0.0.1:8766/.well-known/agent-card.json | python3 -m json.tool
-# "name": "NeetCode 150 reviewer"
-# "skills": [{"id": "review", ...}]
-```
+A manually started reviewer is left alone: if the card is already reachable, dojo does not
+spawn a second copy and does not stop yours. To debug the agent directly you can still run
+`uv run python -m reviewer.server` from `$CURRICULUM`, but the normal flow never requires
+it.
 
 The reviewer runs deterministically whenever no key is available (or the provider is
 `mock`); it needs no key. It reads the **engine's one** `settings.toml` and **one** key; it
@@ -493,68 +491,27 @@ It never reads `DOJO_REVIEWER_API_KEY`, `DOJO_REVIEWER_BASE_URL`, `DOJO_REVIEWER
 not fallbacks; they are ignored. The model path is enabled only when `DOJO_API_KEY` is
 set, the settings file exists and the provider is not `mock`.
 
-This is the contract the manifest already declares:
-
-```toml
-[agents.reviewer]
-url = "http://127.0.0.1:8766/"
-
-[capabilities.review]
-impl = "a2a"
-agent = "reviewer"
-skill = "review"
-```
-
-dojo never starts, stops or authenticates this process.
+If the command cannot start or exits before serving its card, dojo prints the last lines
+of its output. Enrollment then refuses and keeps the installed files; a session continues
+without the advisory review and prints `review unavailable` after submit.
 
 ### 6.1 Deterministic mode (the offline walkthrough)
 
 With no key, no settings file or `provider = "mock"`, the deterministic rubric writes the
-review and no network call is made. The startup line is:
-
-```text
-NeetCode 150 reviewer listening on http://127.0.0.1:8766/ (deterministic, no dojo model configured)
-```
-
-The review is still complete: summary, strengths, improvements, next steps and the
-advisory `quality` score. Leave the key unset for the exact transcripts in sections 8-11.
+review and no network call is made. The review is still complete: summary, strengths,
+improvements, next steps and the advisory `quality` score. Leave the key unset for the
+exact transcripts in sections 8-11.
 
 ### 6.2 Model mode (the same key and config)
 
-Restart the reviewer in a shell that has the key (Ctrl-C first, then use a new terminal
-or `source ~/.zshrc`; section 4's real config, not the mock profile):
-
-```bash
-cd "$CURRICULUM"
-export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
-export DOJO_CONFIG_DIR="$HOME/.config/dojo"   # the real config from section 4
-# DOJO_API_KEY is already exported by your shell rc; do not paste it into a command
-uv run python -m reviewer.server
-```
-
-Expected first line with the real config (the model is `[llm].model`, or the
-`[curricula."neetcode-150".reviewer].model` override):
-
-```text
-NeetCode 150 reviewer listening on http://127.0.0.1:8766/ (model deepseek/deepseek-reasoner)
-```
-
-or, without the override:
-
-```text
-NeetCode 150 reviewer listening on http://127.0.0.1:8766/ (model deepseek/deepseek-chat)
-```
-
-The model writes the review prose from the same review view the deterministic rubric uses
-(statement, submitted files, evidence, grade and claims). The rubric keeps the `quality`
-score, the model's own `quality` (if it sends one) is ignored, and the grade, card and
-evidence are never changed. A transport failure becomes
-`review unavailable: the model reviewer failed: ...`; the agent stays up and the engine
-stores no review. A malformed settings file is reported on the startup line
-(`deterministic, configuration error: ...`) and also leaves the reviewer deterministic.
-
-To go back to the offline walkthrough, Ctrl-C and `unset DOJO_API_KEY` (or point
-`DOJO_CONFIG_DIR` at a mock config) before restarting.
+With the real config from section 4 and `DOJO_API_KEY` exported by the shell rc, the
+reviewer starts in model mode automatically. The model is `[llm].model`, or the
+`[curricula."neetcode-150".reviewer].model` override. The model writes the review prose
+from the same review view the deterministic rubric uses (statement, submitted files,
+evidence, grade and claims). The rubric keeps the `quality` score, the model's own
+`quality` (if it sends one) is ignored, and the grade, card and evidence are never
+changed. A transport failure becomes `review unavailable: ...`; the agent stays up and the
+engine stores no review. A malformed settings file leaves the reviewer deterministic.
 
 ## 7. Enroll the curriculum
 
@@ -611,22 +568,18 @@ Curricula
 `k_smallest_elem_matrix`, `max_prod_3_nums`). Re-enrolling the same local path is how you
 refresh the catalog after a curriculum change (the installer reuses the symlink).
 
-If the reviewer is down at this point, enrollment refuses and enrolls nothing:
-
-```text
-error: cannot verify A2A agent 'reviewer': cannot read the agent card at
-http://127.0.0.1:8766/: Network communication error fetching agent card ...; not
-enrolled, the installed files are kept
-```
-
-The installer leaves the `$DOJO_DATA_DIR/curricula/neetcode-150` symlink, and the database
-has zero `curricula` rows. Restart the reviewer for the next checks.
+If the launch command cannot start or exits before serving its card, enrollment refuses
+and enrolls nothing, with the last lines of the command's output in the error. The
+installer leaves the `$DOJO_DATA_DIR/curricula/neetcode-150` symlink, and the database has
+zero `curricula` rows. `dojo` will try again on the next run; you do not start the
+reviewer yourself.
 
 ## 8. A real practice session: contains_duplicate
 
 `dojo` serves the first unlocked item, which is `contains_duplicate` in Arrays & Hashing.
 It has all four item evaluators: `tests`, `oracle`, `complexity` (measured) and `style`
-(advisory, assurance `judged`).
+(advisory, assurance `judged`). `dojo` does **not** open your editor at startup, so you can
+read the statement first.
 
 ```bash
 cd "$ENGINE"
@@ -634,27 +587,27 @@ cd "$ENGINE"
 uv run dojo
 ```
 
-Expected start:
+Expected start (the panel is rounded and the hint is one dim line):
 
 ```text
-NeetCode 150 · Contains Duplicate
-workspace: /Users/andywang/dojo-p6d/workbench/neetcode-150/contains_duplicate/<session>
-
-Given an integer array nums, return true if any value appears more than once ...
-Commands:
-  open       open the workspace in your editor
-  check      run the item's check command
-  submit     assess the workspace and end the session
-  learn      learn the topic with the teacher, then `practice`
-  quit       abandon the session; nothing is recorded
-  statement  print the statement again
-  help       this list
-Any other text asks the tutor at your current hint level.
-dojo>
+╭───────────────────── NeetCode 150 · Contains Duplicate ──────────────────────╮
+│ Given an integer array nums, return true if any value appears more than once │
+│ in the array, otherwise return false.                                        │
+│                                                                              │
+│ Example 1: Input: nums = [1, 2, 3, 3] Output: true                           │
+│ Example 2: Input: nums = [1, 2, 3, 4] Output: false                          │
+│                                                                              │
+│ You should aim for a solution with O(n) time and O(n) space, where n is the  │
+│ size of the input array.                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+open · check · submit · learn · quit · statement · help
+dojo> 
 ```
 
-Replace the stub in `solution.py` with a correct solution, save and close the editor. For
-this runbook a set is enough:
+Type `open` to open `solution.py`. The statement is prepended to the file as a docstring,
+so you do not need to switch back to the terminal to read it. The visible `check.py` is not
+in the workspace root; it lives under `.dojo/` and is never opened by `open`. Replace the
+stub with a correct solution and save. For this runbook a set is enough:
 
 ```python
 def contains_duplicate(nums: list[int]) -> bool:
@@ -670,8 +623,10 @@ At the `dojo>` prompt:
 
 ```text
 dojo> check
-check exited 0
-4 of 4 visible checks passed
+╭─────────────────────────────────── check ────────────────────────────────────╮
+│ check exited 0                                                               │
+│ 4 of 4 visible checks passed                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
 Before you submit, you can run section 9's mock tutor/`learn` flow in this same session
@@ -686,25 +641,27 @@ dojo> submit
 Expected evidence and grade (timings and the last decimals vary):
 
 ```text
-Evidence
-┏━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ evaluator  ┃ assurance ┃ outcome ┃ summary                                   ┃
-┡━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ tests      │ machine   │ pass    │ 26/26 private cases passed                │
-│ oracle     │ machine   │ pass    │ 26/26 private cases passed                │
-│ complexity │ measured  │ pass    │ time like the reference (1.10x); space    │
-│            │           │         │ like the reference                        │
-│ style      │ judged    │ pass    │ no advisory style flags                   │
-└────────────┴───────────┴─────────┴───────────────────────────────────────────┘
-Grade: 3 (pass)
-Next review: <date> (in 2 days)
-review · advisory, the grade stands
-Summary: Review of contains_duplicate in neetcode-150: grade 3 (pass); 4 of 4 evaluator
-reports passed. The code reads as Arrays & Hashing and uses a set for O(1) membership ...
-Strengths: ...
-Improvements: ...
-Next steps: ...
-Quality: 0.76/1
+dojo> submit
+╭────────────────────────────────── evidence ──────────────────────────────────╮
+│ evaluator   assurance   outcome   summary                                    │
+│ tests       machine     pass      26/26 private cases passed                 │
+│ oracle      machine     pass      26/26 private cases passed                 │
+│ complexity  measured    pass      time like the reference (1.10x); space ... │
+│ style       judged      pass      no advisory style flags                    │
+│                                                                              │
+│ Grade: 3 (pass)                                                              │
+│ Next review: <date> (in 2 days)                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────── review · advisory, the grade stands ─────────────────────╮
+│ Summary. Review of contains_duplicate in neetcode-150: grade 3 (pass); 4 of  │
+│ 4 evaluator reports passed. The code reads as Arrays & Hashing and uses a    │
+│ set for O(1) membership ...                                                  │
+│                                                                              │
+│ Strengths                                                                    │
+│  • ...                                                                       │
+│                                                                              │
+│ Quality. 0.76 / 1                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
 The review block is the deterministic P6-C rubric from section 6.1. In model mode
@@ -782,12 +739,7 @@ dojo> learn
 learn · NeetCode 150 · Arrays & Hashing
 9 ladder problems in this pattern, 10 of them curated so far.
 0/152 exercises done. Recent grades, newest first: none yet.
-Learn commands:
-  practice   go back to a fresh practice session
-  done       leave the teacher loop
-  quit       leave the teacher loop
-  help       this list
-Any other text asks the topic teacher; it never sees this exercise.
+practice · done · quit · help
 learn> what is an invariant?
 teacher · Arrays & Hashing
 Mock teacher: state the invariant in one sentence, then test it on a small input.
@@ -796,22 +748,24 @@ Left learn. The practice session was already abandoned.
 ```
 
 `practice` instead of `done` starts a fresh session on the next unsolved item — on this
-first run that is `contains_duplicate` again. The editor opens a new workspace with the
-starter stub; write the solution again before `check`/`submit`. `done` or `quit` leaves
-the teacher loop. The abandoned session keeps its hint level and is not an attempt.
+first run that is `contains_duplicate` again. Type `open` to open the new `solution.py`
+(its statement docstring is already there); write the solution before `check`/`submit`.
+`done` or `quit` leaves the teacher loop. The abandoned session keeps its hint level and
+is not an attempt.
 
 With a live provider in the profile config (section 5) the same commands call the real
 model, so the answers are real prose rather than the `Mock tutor:`/`Mock teacher:` text.
-The boundary is unchanged: the tutor sees the statement, workspace, last check output,
-prior turns and the question; the teacher sees the curriculum, topic and a compact learner
-summary, never the item statement.
+The boundary is unchanged: the tutor sees the statement, the **current solution.py** (as
+its own labelled block), the other workspace files, the last check output, prior turns
+and the question; the teacher sees the curriculum, topic and a compact learner summary,
+never the item statement.
 
 **No key is now a setup gate, not a mid-session mode.** A live provider with no
 `DOJO_API_KEY` never reaches a session: `dojo` stops at the setup check (section 4.5/4.7).
 Use the mock provider (this profile) to run the LLM path offline, or export the key. If a
 provider call fails while a session is already running (an unreachable `base_url`, an
 outage), the tutor/teacher report unavailable and `check`/`submit` continue; the A2A review
-still works if the reviewer is up. Section 11 covers the no-key gate and the deterministic
+still works; dojo restarts the reviewer before the review. Section 11 covers the no-key gate and the deterministic
 reviewer.
 
 ### Blocked leak-auditor check (optional, loopback stub)
@@ -872,8 +826,9 @@ The hint level is unchanged. Ask again, or type `help`.
 ```
 
 The student turn and the tutor/auditor provenance are recorded; no tutor turn is stored
-and the level does not move. Stop the stub with Ctrl-C. Keep the reviewer (terminal 1) on
-its own config, so this stub only serves the engine's tutor/auditor.
+and the level does not move. Stop the stub with Ctrl-C. The reviewer reads the same
+config, so this stub may also make its optional model path fail; the review is still
+advisory and the grade, evidence and card are unaffected.
 
 ## 10. Progress, history, curricula, settings and unenroll
 
@@ -883,15 +838,21 @@ cd "$ENGINE"
 uv run dojo progress neetcode-150
 ```
 
-The roadmap prints all 18 patterns and every item with its status (`done`, `next`, `open`,
-`locked`, `retired`), plus the `neetcode-150: N/152 done` line (`N` is 1 after section 8's
-submit). Retired items are shown but not counted or served:
+The roadmap is a compact tree inside a rounded panel. The **current** pattern is expanded
+with every item and its status (`done`, `next`, `open`, `locked`, `retired`); every other
+pattern is one collapsed line (`locked`, `open` or `complete`), not a table:
 
 ```text
-neetcode-150: 1/152 done
-Arrays & Hashing
-...
-│ Array Intersection            │ retired │
+╭───────────────────────── neetcode-150 · 1/152 done ──────────────────────────╮
+│ Arrays & Hashing  ·  1/10                                                    │
+│   ✓ Contains Duplicate  done                                                 │
+│   → Valid Anagram  next                                                      │
+│   ○ Two Sum  open                                                            │
+│   ...                                                                        │
+│   - Array Intersection  retired                                              │
+│ Two Pointers  ·  5 items  ·  locked                                          │
+│ ...                                                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
 This is the full-corpus smoke: the catalog has all 157 items and all their
@@ -999,70 +960,57 @@ Section 5's profile is the mock boundary:
 
 - the setup wizard asks no key and writes no rc block (`shell: unchanged`);
 - the engine's tutor/teacher answer offline (`Mock tutor:`/`Mock teacher:`);
-- the reviewer's startup line says `deterministic, no dojo model configured`;
+- dojo starts the reviewer itself; with no key it is deterministic;
 - `check`, `submit` and the A2A review all work; no request leaves the machine.
 
 This is the recommended first run and the exact transcript source for sections 8-9.
 
-### 11.4 Reviewer down at enrollment
+### 11.4 Reviewer launch failure (optional)
 
-Stop the reviewer (Ctrl-C) and enroll into a fresh profile:
+The old "start the reviewer by hand, then enroll" path no longer exists. To exercise the
+failure, use a scratch copy of the curriculum whose agent command cannot start:
 
 ```bash
 export P6D="$HOME/dojo-p6d-down"
 export DOJO_DATA_DIR="$P6D/data" DOJO_CONFIG_DIR="$P6D/config" DOJO_WORKBENCH_DIR="$P6D/workbench"
 mkdir -p "$DOJO_DATA_DIR" "$DOJO_CONFIG_DIR" "$DOJO_WORKBENCH_DIR"
 cp "$HOME/dojo-p6d/config/settings.toml" "$DOJO_CONFIG_DIR/settings.toml"
+cp -R "$CURRICULUM" "$HOME/neetcode-broken"
+python3 - "$HOME/neetcode-broken/curriculum.toml" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+text = path.read_text()
+text = text.replace(
+    'command = ["uv", "run", "--project", ".", "python", "-m", "reviewer.server"]',
+    'command = ["false"]',
+)
+path.write_text(text)
+PY
 cd "$ENGINE"
-uv run dojo enroll "$CURRICULUM"
+uv run dojo enroll "$HOME/neetcode-broken"
 ```
 
-Expected: exit code 1 and one clear error naming the card URL, ending
-`not enrolled, the installed files are kept`:
+Expected: exit code 1, the error names the agent and includes the command's last output,
+ending `not enrolled, the installed files are kept`. The installer leaves the symlink and
+the database has zero `curricula` rows. Delete the scratch copy; `dojo` retries on the next
+run.
 
-```text
-error: cannot verify A2A agent 'reviewer': cannot read the agent card at
-http://127.0.0.1:8766/: Network communication error fetching agent card from
-http://127.0.0.1:8766/.well-known/agent-card.json: All connection attempts failed; not
-enrolled, the installed files are kept
-```
+### 11.5 Reviewer restart while a session is open
 
-The installer leaves the `$DOJO_DATA_DIR/curricula/neetcode-150` symlink, and the database
-has zero `curricula` rows. Restart the reviewer for the next checks.
-
-### 11.5 Reviewer stopped after enrollment
-
-Re-enroll first (section 7) if you ran section 10's unenroll, then stop the reviewer and
-submit an item (for example the next `dojo` session):
-
-```text
-dojo> submit
-Grade: 3 (pass)
-Next review: <date> (in 2 days)
-review unavailable: the review failed: Network communication error fetching agent card from http://127.0.0.1:8766/.well-known/agent-card.json: All connection attempts failed
-```
-
-The attempt, grade, evidence and card are recorded; no `reviews` row and no `reviewer`
-`ai_calls` row for that attempt are written. Restart the reviewer and submit another item
-to see the review return.
+Start a session, then in another terminal kill the agent process
+(`pkill -f 'reviewer.server'`). On `submit`, dojo notices the card is unreachable, starts
+the declared command again, and the review is produced. There is no separate server to
+restart and no reviewer-specific state to preserve.
 
 ### 11.6 No key for the reviewer
 
 With the profile's mock config (or with `provider = "mock"`, or with no settings file) the
-reviewer stays deterministic and complete; there is no "reviewer key" to set. To prove the
-reviewer ignores the legacy variables, start it with only those:
-
-```bash
-cd "$CURRICULUM"
-export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
-env -u DOJO_API_KEY DOJO_REVIEWER_API_KEY=sk-ignored OPENAI_API_KEY=sk-ignored \
-  DOJO_REVIEWER_MODEL=gpt-4o-mini DOJO_CONFIG_DIR="$HOME/dojo-p6d/config" \
-  uv run python -m reviewer.server
-```
-
-It prints `deterministic, no dojo model configured` and the review works; the ignored
-variables never reach a model. The only way to enable model prose is the one
-`DOJO_API_KEY` plus a live provider in the same settings file (section 6.2).
+reviewer stays deterministic and complete; there is no "reviewer key" to set. The engine
+starts it on demand and stores the review; no `DOJO_REVIEWER_*` or `OPENAI_*` variable is
+read. To see model prose, set the one `DOJO_API_KEY` and a live provider in the same
+settings file (section 6.2).
 
 ### 11.7 Blocked leak audit
 
@@ -1092,7 +1040,7 @@ From the engine checkout (read-only for P6-D):
 
 ```bash
 cd "$ENGINE"
-uv run pytest                 # 565
+uv run pytest                 # 579
 uv run ruff check .           # clean
 uv run ty check .             # clean
 uv run ruff format --check .  # see the known-issue note below
@@ -1219,7 +1167,7 @@ The real setup and the isolated profile are separate:
 Cleanup after testing (the real config and rc block stay; they are the actual setup):
 
 ```bash
-# stop the reviewer (Ctrl-C in terminal 1) and any stub (section 9)
+# stop any optional stub (section 9); dojo stops the reviewer when it exits
 rm -rf "$HOME/dojo-p6d" "$HOME/dojo-p6d-down" "$HOME/dojo-p6d-missing" \
        "$HOME/dojo-p6d-live" "$HOME/dojo-p6d-block" "$HOME/dojo-p6d-wizard"
 ```
@@ -1261,7 +1209,7 @@ Privacy and the data boundary:
   `--no-setup`, `DOJO_NO_SETUP` and a non-TTY fail actionably instead of prompting;
   `--help` and `--version` never run setup.
 - The reviewer serves `NeetCode 150 reviewer` with the `review` skill on 8766; its
-  startup line is deterministic with no key and `model <provider>/<model>` with the one
+  review is deterministic with no key and model-written with the one
   key and a live config; it reads no reviewer-specific environment.
 - `dojo enroll` prints `Enrolled NeetCode 150 (neetcode-150)`, `items: 157`, `active: yes`.
 - `dojo curricula` shows 152 active items; `dojo progress` lists 18 patterns and every
@@ -1270,11 +1218,11 @@ Privacy and the data boundary:
   manifest's assurance (`machine`, `machine`, `measured`, `judged`), grade 3 and a card.
 - The review is advisory, comes from `reviewer/review`, and is stored with
   `provider = a2a`; the attempt/card are untouched.
-- With the reviewer down after enrollment, submit still records grade/card/attempt and
-  prints `review unavailable`.
+- Killing the reviewer mid-session is repaired on submit: dojo starts the declared
+  command again and the review is produced.
 - With a live provider and no key, the CLI stops actionably; with `mock` the whole flow is
   offline; with no key the reviewer is deterministic.
-- The curriculum suite is 373 (223 + 150), `ruff` and `ty` are clean; the engine is 565
+- The curriculum suite is 373 (223 + 150), `ruff` and `ty` are clean; the engine is 579
   and clean apart from the pre-existing `docs/phase-2.md` formatting note; the reference
   agent is 17.
 - No private material appears in any prompt, workspace, review request or committed file.

@@ -14,7 +14,11 @@ offline.
 
 ## Run it
 
-From the **repository root** (the reviewer uses the repository's uv environment):
+You do not normally run the reviewer yourself: `dojo` reads the curriculum manifest,
+probes the card, starts the declared command in the repository root when the card is
+missing, and stops it when `dojo` exits. That is the only entrypoint.
+
+For debugging, you can still start it directly from the **repository root**:
 
 ```bash
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
@@ -35,6 +39,7 @@ This is the contract P5-B's manifest already declares:
 ```toml
 [agents.reviewer]
 url = "http://127.0.0.1:8766/"
+command = ["uv", "run", "--project", ".", "python", "-m", "reviewer.server"]
 
 [capabilities.review]
 impl = "a2a"
@@ -42,8 +47,8 @@ agent = "reviewer"
 skill = "review"
 ```
 
-dojo never spawns the agent, so keep it running while you enroll and submit. The card is
-the enrollment probe; the same card is checked again before every review.
+The card is the enrollment probe; the same card is checked again before every review. If
+you start the agent manually, dojo sees the card and leaves it alone.
 
 ## Card and skill
 

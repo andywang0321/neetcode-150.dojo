@@ -12,7 +12,7 @@ reset_markers = ["stuck", "no idea", "i don't know", "lost", "give up"]
 
 [[level]]
 name = "articulate the blockage"
-may = "Ask what they have already tried and where exactly the code or the reasoning stops. Do not name a technique, a data structure or an algorithm, and do not write code."
+may = "Read the student's current code and check output first. Point at where the code or reasoning actually stops and ask about that. Do not name a technique, a data structure or an algorithm, and do not write code."
 
 [[level]]
 name = "conceptual nudge"

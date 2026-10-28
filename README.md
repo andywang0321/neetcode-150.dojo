@@ -79,13 +79,10 @@ cd /Users/andywang/Projects/dojo-workspace/rebuild
 uv sync
 uv run dojo
 
-# 2. the reviewer (dojo never starts it); same config and key, no reviewer key
+# 2. the reviewer is started by dojo from the manifest command; no separate terminal
 cd /Users/andywang/Projects/dojo-workspace/neetcode-150.dojo
 uv sync
-unset DOJO_API_KEY          # deterministic review; omit for model prose with the one key
-uv run python -m reviewer.server
-# card: http://127.0.0.1:8766/.well-known/agent-card.json
-# skill: review
+# dojo probes the card, starts `reviewer.server` when needed and stops it on exit
 
 # 3. the engine, against isolated test data and the same one config
 cd /Users/andywang/Projects/dojo-workspace/rebuild
@@ -96,9 +93,9 @@ uv run dojo enroll /Users/andywang/Projects/dojo-workspace/neetcode-150.dojo
 uv run dojo
 ```
 
-The reviewer is required at enrollment (the card and skill are probed). It is not
-required at submit: if it is stopped, the attempt, grade and card are recorded and
-`review unavailable` is printed. With `provider = "mock"` (or a mock profile) `check` and
+The reviewer is required at enrollment (the card and skill are probed) and is started
+automatically. If its launch command fails, the attempt, grade and card are still recorded
+and `review unavailable` is printed. With `provider = "mock"` (or a mock profile) `check` and
 `submit` work offline and no key is needed; a live provider without `DOJO_API_KEY` stops
 at the setup gate. The reviewer is deterministic without a key; with the one key and a
 live config it writes the prose from the same review view, and
