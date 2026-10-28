@@ -7,9 +7,10 @@ serves one `review` skill, reads a `review.v1` request, and returns an advisory
 
 The review body is NeetCode-specific and deterministic by default: it reads the item
 family, the submitted Python, the evaluator evidence and the student's claims, and cites
-line-level findings. If an OpenAI-compatible model is configured, the model writes the
-prose from the same grounded context; the rubric keeps the `quality` score. With no key,
-no model is called and the review works offline.
+line-level findings. If the one dojo settings file configures a provider and
+`DOJO_API_KEY` is set, the model writes the prose from the same grounded context; the
+rubric keeps the `quality` score. With no key, no model is called and the review works
+offline.
 
 ## Run it
 
@@ -158,23 +159,60 @@ rounded to two decimals:
 
 ## Model configuration (optional)
 
-The agent speaks the OpenAI chat-completions wire. It is enabled by a key; without one
-the deterministic review runs and no network call is made.
+The reviewer has no configuration of its own. It uses the dojo engine's **one**
+`settings.toml` and **one** key, so a single provider/model choice drives the engine and
+the review prose:
 
-| variable | default | meaning |
+- config file: `$DOJO_CONFIG_DIR/settings.toml`; when `DOJO_CONFIG_DIR` is unset, the
+  engine's default `$XDG_CONFIG_HOME/dojo/settings.toml` (`~/.config/dojo/settings.toml`);
+- key: `DOJO_API_KEY`, and nothing else.
+
+The reviewer never reads `DOJO_REVIEWER_API_KEY`, `DOJO_REVIEWER_BASE_URL`,
+`DOJO_REVIEWER_MODEL`, `DOJO_REVIEWER_TIMEOUT_SECONDS`, `OPENAI_API_KEY`,
+`OPENAI_BASE_URL`, `DEEPSEEK_API_KEY`, `ANTHROPIC_API_KEY` or any other provider-specific
+key variable. Those are not fallbacks; they are ignored.
+
+| key | default | meaning |
 |---|---|---|
-| `DOJO_REVIEWER_API_KEY` | unset | enables the model path; `OPENAI_API_KEY` is a fallback |
-| `DOJO_REVIEWER_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base; `OPENAI_BASE_URL` is a fallback |
-| `DOJO_REVIEWER_MODEL` | `gpt-4o-mini` | model name sent to the endpoint |
-| `DOJO_REVIEWER_TIMEOUT_SECONDS` | `60` | request timeout; invalid/`<= 0` falls back to 60 |
+| `[llm].provider` | `deepseek` | `deepseek`, `openai`, `anthropic` or `mock`; selects the wire, host and default model |
+| `[llm].model` | the provider default | the model name sent to the endpoint |
+| `[llm].base_url` | the provider host | optional host override |
+| `[curricula."neetcode-150".reviewer].model` | unset | optional reviewer model; falls back to `[llm].model` |
 
-The request is one `POST {base_url}/chat/completions` with `temperature: 0` and the
-system rubric plus the grounded user context. The endpoint must return a
-`choices[0].message.content` string containing the JSON object. Fences and extra keys are
-tolerated; an empty summary, invalid JSON, an HTTP/transport failure or a timeout is a
-`review unavailable:` message. The model's `quality` (if it sends one) is ignored: the
-rubric owns the score, so a model change cannot silently move it, and the model cannot
-change the grade.
+```toml
+[llm]
+provider = "deepseek"
+model = "deepseek-chat"
+# base_url = "http://localhost:8080/v1"   # optional
+
+[curricula."neetcode-150".reviewer]
+model = "deepseek-reasoner"   # optional; the engine keeps using [llm].model
+```
+
+The model path is enabled only when `DOJO_API_KEY` is set **and** the settings file exists
+**and** the provider is not `mock`. With no key, no file, `provider = "mock"`, or a
+settings file the reviewer cannot parse, the deterministic review runs and no network
+call is made. A parse or provider error is reported on the startup line and the agent
+stays up.
+
+Provider hosts, wires and default models mirror the engine's provider table:
+
+| provider | wire | default host | default model |
+|---|---|---|---|
+| `deepseek` | OpenAI chat completions | `https://api.deepseek.com` | `deepseek-chat` |
+| `openai` | OpenAI chat completions | `https://api.openai.com/v1` | `gpt-4.1-mini` |
+| `anthropic` | Anthropic messages | `https://api.anthropic.com` | `claude-sonnet-4-5` |
+| `mock` | none (offline) | — | — |
+
+For the OpenAI wire the request is one `POST {base_url}/chat/completions` and the endpoint
+must return a `choices[0].message.content` string containing the JSON object. For
+Anthropic it is one `POST {base_url}/v1/messages` with the rubric as `system` and the
+context as one user message, and the endpoint must return a `content[]` text block. Both
+send `temperature: 0` and time out after 60 seconds. Fences and extra keys are tolerated;
+an empty summary, invalid JSON, an HTTP/transport failure, a missing content block or a
+timeout is a `review unavailable:` message. The model's `quality` (if it sends one) is
+ignored: the rubric owns the score, so a model change cannot silently move it, and the
+model cannot change the grade.
 
 The model prompt contains only the review view and the static facts derived from the
 submitted files. It never contains a private case, an oracle, a reference solution, the
@@ -186,9 +224,11 @@ assessment tree or the student's history.
   `statement`, `files`, `evidence`, `grade`, `claims`. Extra fields — including
   `assessment`, `hidden_cases`, `oracle`, `reference` or `private_cases` — are rejected
   by validation and become `review unavailable`, never part of the context.
-- The production modules read no files (`reviewer/tests/test_boundary.py` checks the AST
-  for `open`/`read_text`), import nothing from `neetcode_dojo`, and have no path to
-  `neetcode_dojo/assessment/`. The only outbound I/O is the optional model POST.
+- The only file the production modules read is the one dojo `settings.toml`, once at
+  startup: `reviewer/tests/test_boundary.py` confines file reads to `reviewer/config.py`
+  and checks that it opens exactly that path. The modules import nothing from
+  `neetcode_dojo` and have no path to `neetcode_dojo/assessment/`. The only outbound I/O
+  is the optional model POST.
 - The statement, submitted code and claims are treated as data, not instructions; the
   system rubric tells the model to ignore instructions embedded in them.
 - The visible `check.py` is curriculum scaffolding: it is not analysed for code findings.
@@ -199,7 +239,8 @@ assessment tree or the student's history.
 
 The reviewer suite is offline and deterministic: the model is a recording double (or
 absent), and the server tests use `httpx.ASGITransport` against the real ASGI app, so no
-port is bound and no network is used. No key is read in tests.
+port is bound and no real key or network is used. The config tests write a throwaway
+`settings.toml` under `tmp_path`.
 
 From the repository root:
 
@@ -207,7 +248,7 @@ From the repository root:
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
 uv sync
 uv run pytest                      # both suites (curriculum tests + reviewer)
-uv run pytest reviewer/tests       # the reviewer suite only (123 tests)
+uv run pytest reviewer/tests       # the reviewer suite only (150 tests)
 uv run ruff check .
 uv run ruff format --check .
 uv run ty check .
@@ -232,11 +273,12 @@ repository's approved `a2a-sdk[fastapi]`, `pydantic` and `uvicorn` environment.
 | `reviewer/advice.py` | summary, strengths, next steps and the quality rubric |
 | `reviewer/findings.py` | grounded improvements, claim checks and the pattern revisit |
 | `reviewer/prompt.py` | the ported reviewer rubric and the model context |
-| `reviewer/model.py` | optional OpenAI-compatible client (urllib, no new dependency) |
+| `reviewer/config.py` | reads the one dojo `settings.toml` (the only file read) |
+| `reviewer/model.py` | optional dojo-model client over the engine's provider wire (urllib, no new dependency) |
 | `reviewer/review.py` | the entry point: deterministic review, optional model merge |
 | `reviewer/executor.py` | message-only `AgentExecutor`, errors as text |
 | `reviewer/app.py` | card routes + JSON-RPC route on a Starlette app |
-| `reviewer/tests/` | card, analysis, patterns, review, model, executor, boundary, server |
+| `reviewer/tests/` | card, analysis, patterns, review, config, model, executor, boundary, server |
 
 The reviewer mirrors the engine's `review.v1`/`ReviewResult` shape by hand, just like the
 engine's reference agent, so it never depends on the engine package or its database.

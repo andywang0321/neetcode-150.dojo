@@ -10,12 +10,14 @@ from pydantic import ValidationError
 import reviewer
 from reviewer.analysis import analyze
 from reviewer.contracts import ReviewEvidence, ReviewRequest, ReviewResult
+from reviewer.model import model_from_environment
 from reviewer.patterns import detect_pattern
 from reviewer.prompt import REVIEWER_SYSTEM, build_prompt
 from reviewer.review import review
 from reviewer.tests.support import make_request
 
 _HIDDEN_FIELDS = ("assessment", "hidden_cases", "oracle", "reference", "private_cases")
+_CONFIG_MODULE = "config.py"
 
 
 class EchoModel:
@@ -114,6 +116,8 @@ def test_review_reads_no_files(monkeypatch: pytest.MonkeyPatch) -> None:
         raise AssertionError("the reviewer tried to read a file")
 
     monkeypatch.setattr(builtins, "open", denied)
+    monkeypatch.setattr(Path, "read_text", denied)
+    monkeypatch.setattr(Path, "read_bytes", denied)
     request = make_request()
 
     result = review(request)
@@ -129,17 +133,41 @@ def test_production_modules_never_import_the_private_curriculum() -> None:
         for module in _imports(tree):
             assert not module.startswith("neetcode_dojo"), f"{path.name} imports {module}"
             assert "assessment" not in module, f"{path.name} imports {module}"
+            assert module != "sqlite3", f"{path.name} imports the engine database"
 
 
-def test_production_modules_do_not_read_files() -> None:
+def test_only_the_config_module_reads_files() -> None:
     for path in _module_files():
+        if path.name == _CONFIG_MODULE:
+            continue
         tree = ast.parse(path.read_text(), filename=str(path))
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
             assert not (isinstance(node.func, ast.Name) and node.func.id == "open")
             if isinstance(node.func, ast.Attribute):
-                assert node.func.attr not in {"read_text", "read_bytes"}
+                assert node.func.attr not in {"read_text", "read_bytes", "open"}
+
+
+def test_the_config_module_reads_only_the_dojo_settings_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    settings = tmp_path / "settings.toml"
+    settings.write_text('[llm]\nprovider = "openai"\nmodel = "test-model"\n', encoding="utf-8")
+    reads: list[Path] = []
+    real_read_text = Path.read_text
+
+    def recording_read_text(
+        self: Path, encoding: str | None = None, errors: str | None = None
+    ) -> str:
+        reads.append(self)
+        return real_read_text(self, encoding=encoding, errors=errors)
+
+    monkeypatch.setattr(Path, "read_text", recording_read_text)
+    model = model_from_environment({"DOJO_API_KEY": "key", "DOJO_CONFIG_DIR": str(tmp_path)})
+
+    assert model is not None
+    assert reads == [settings]
 
 
 def test_result_has_no_grade_field() -> None:

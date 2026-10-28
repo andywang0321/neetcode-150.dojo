@@ -1,18 +1,22 @@
-"""The OpenAI-compatible model client is optional, offline-testable and fail-closed."""
+"""The optional model client is configured by the one dojo settings file and key."""
 
 import json
 from collections.abc import Mapping
+from pathlib import Path
 
 import pytest
 
+import reviewer.model as model_module
+from reviewer.config import ConfigError
 from reviewer.model import (
-    DEFAULT_BASE_URL,
-    DEFAULT_MODEL,
+    ANTHROPIC_VERSION,
     DEFAULT_TIMEOUT_SECONDS,
+    AnthropicReviewer,
+    ModelConfigError,
     ModelSettings,
     ModelUnavailable,
     OpenAICompatibleReviewer,
-    model_from_env,
+    model_from_environment,
     parse_review,
 )
 
@@ -36,8 +40,19 @@ class FailingTransport:
         raise RuntimeError("connection reset")
 
 
+def _write_settings(tmp_path: Path, source: str) -> Path:
+    path = tmp_path / "settings.toml"
+    path.write_text(source, encoding="utf-8")
+    return path
+
+
+def _env(tmp_path: Path, *, key: str = "dojo-key") -> dict[str, str]:
+    return {"DOJO_API_KEY": key, "DOJO_CONFIG_DIR": str(tmp_path)}
+
+
 def _settings(**overrides: object) -> ModelSettings:
     values: dict[str, object] = {
+        "provider": "openai",
         "base_url": "http://model.local/v1",
         "model": "test-model",
         "api_key": "secret",
@@ -45,6 +60,7 @@ def _settings(**overrides: object) -> ModelSettings:
     }
     values.update(overrides)
     return ModelSettings(
+        provider=str(values["provider"]),
         base_url=str(values["base_url"]),
         model=str(values["model"]),
         api_key=str(values["api_key"]),
@@ -54,6 +70,10 @@ def _settings(**overrides: object) -> ModelSettings:
 
 def _envelope(content: str) -> str:
     return json.dumps({"choices": [{"message": {"content": content}}]})
+
+
+def _anthropic_envelope(content: str) -> str:
+    return json.dumps({"content": [{"type": "text", "text": content}]})
 
 
 def _review_json(**overrides: object) -> str:
@@ -67,58 +87,183 @@ def _review_json(**overrides: object) -> str:
     return json.dumps(values)
 
 
-def test_no_key_means_deterministic_mode() -> None:
-    assert ModelSettings.from_env({}) is None
-    assert model_from_env({}) is None
+def test_no_key_means_deterministic_mode(tmp_path: Path) -> None:
+    _write_settings(
+        tmp_path,
+        '[llm]\nprovider = "openai"\nmodel = "config-model"\n',
+    )
+
+    assert model_from_environment({}) is None
+    assert model_from_environment({"DOJO_CONFIG_DIR": str(tmp_path)}) is None
 
 
-def test_defaults_and_openai_fallbacks() -> None:
-    settings = ModelSettings.from_env({"DOJO_REVIEWER_API_KEY": "key"})
+def test_config_dir_settings_select_the_provider_model_and_base_url(tmp_path: Path) -> None:
+    _write_settings(
+        tmp_path,
+        """
+[llm]
+provider = "openai"
+model = "config-model"
+base_url = "http://localhost:8000/v1/"
+""",
+    )
 
-    assert settings == ModelSettings(
-        base_url=DEFAULT_BASE_URL,
-        model=DEFAULT_MODEL,
-        api_key="key",
+    model = model_from_environment(_env(tmp_path))
+
+    assert isinstance(model, OpenAICompatibleReviewer)
+    assert model.settings == ModelSettings(
+        provider="openai",
+        base_url="http://localhost:8000/v1",
+        model="config-model",
+        api_key="dojo-key",
         timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
     )
-    fallback = ModelSettings.from_env(
-        {"OPENAI_API_KEY": "openai-key", "OPENAI_BASE_URL": "http://x/v1"}
+
+
+@pytest.mark.parametrize(
+    ("provider", "base_url", "default_model"),
+    [
+        ("deepseek", "https://api.deepseek.com", "deepseek-chat"),
+        ("openai", "https://api.openai.com/v1", "gpt-4.1-mini"),
+        ("anthropic", "https://api.anthropic.com", "claude-sonnet-4-5"),
+    ],
+)
+def test_provider_defaults_its_host_model_and_wire(
+    tmp_path: Path, provider: str, base_url: str, default_model: str
+) -> None:
+    _write_settings(tmp_path, f'[llm]\nprovider = "{provider}"\n')
+
+    model = model_from_environment(_env(tmp_path))
+
+    assert model is not None
+    assert model.settings.provider == provider
+    assert model.settings.base_url == base_url
+    assert model.settings.model == default_model
+    expected = AnthropicReviewer if provider == "anthropic" else OpenAICompatibleReviewer
+    assert isinstance(model, expected)
+
+
+def test_curriculum_reviewer_model_overrides_the_llm_model(tmp_path: Path) -> None:
+    _write_settings(
+        tmp_path,
+        """
+[llm]
+provider = "openai"
+model = "base-model"
+
+[curricula.neetcode-150.reviewer]
+model = "review-model"
+""",
     )
-    assert fallback is not None
-    assert fallback.api_key == "openai-key"
-    assert fallback.base_url == "http://x/v1"
+
+    model = model_from_environment(_env(tmp_path))
+
+    assert model is not None
+    assert model.settings.model == "review-model"
 
 
-def test_reviewer_settings_can_be_overridden() -> None:
-    settings = ModelSettings.from_env(
-        {
-            "DOJO_REVIEWER_API_KEY": "key",
-            "DOJO_REVIEWER_BASE_URL": "http://localhost:8000/v1/",
-            "DOJO_REVIEWER_MODEL": "local-model",
-            "DOJO_REVIEWER_TIMEOUT_SECONDS": "12.5",
-        }
+def test_a_missing_config_is_deterministic(tmp_path: Path) -> None:
+    assert model_from_environment(_env(tmp_path)) is None
+
+
+def test_an_empty_settings_file_uses_the_engine_defaults(tmp_path: Path) -> None:
+    _write_settings(tmp_path, "")
+
+    model = model_from_environment(_env(tmp_path))
+
+    assert model is not None
+    assert model.settings.provider == "deepseek"
+    assert model.settings.model == "deepseek-chat"
+
+
+def test_a_mock_provider_is_deterministic(tmp_path: Path) -> None:
+    _write_settings(tmp_path, '[llm]\nprovider = "mock"\nmodel = "mock"\n')
+
+    assert model_from_environment(_env(tmp_path)) is None
+
+
+def test_old_reviewer_and_provider_key_variables_are_ignored(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_settings(
+        tmp_path,
+        '[llm]\nprovider = "openai"\nmodel = "config-model"\n',
     )
+    monkeypatch.delenv("DOJO_API_KEY", raising=False)
+    monkeypatch.setenv("DOJO_CONFIG_DIR", str(tmp_path))
+    for name in (
+        "DOJO_REVIEWER_API_KEY",
+        "OPENAI_API_KEY",
+        "DEEPSEEK_API_KEY",
+        "ANTHROPIC_API_KEY",
+    ):
+        monkeypatch.setenv(name, "not-a-dojo-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://old-openai.local/v1")
 
-    assert settings is not None
-    assert settings.base_url == "http://localhost:8000/v1"
-    assert settings.model == "local-model"
-    assert settings.timeout_seconds == 12.5
-
-
-def test_invalid_timeout_falls_back_to_the_default() -> None:
-    for value in ("", "soon", "-1", "0"):
-        settings = ModelSettings.from_env(
-            {"DOJO_REVIEWER_API_KEY": "key", "DOJO_REVIEWER_TIMEOUT_SECONDS": value}
-        )
-        assert settings is not None
-        assert settings.timeout_seconds == DEFAULT_TIMEOUT_SECONDS
+    assert model_from_environment() is None
 
 
-def test_model_from_env_builds_the_client_without_calling_it() -> None:
-    reviewer = model_from_env({"DOJO_REVIEWER_API_KEY": "key"})
+def test_dojo_api_key_and_settings_win_over_the_old_variables(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_settings(
+        tmp_path,
+        """
+[llm]
+provider = "openai"
+model = "config-model"
+base_url = "http://config.local/v1"
+""",
+    )
+    monkeypatch.setenv("DOJO_API_KEY", "dojo-key")
+    monkeypatch.setenv("DOJO_CONFIG_DIR", str(tmp_path))
+    monkeypatch.setenv("DOJO_REVIEWER_API_KEY", "old-reviewer-key")
+    monkeypatch.setenv("OPENAI_API_KEY", "old-openai-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://old-openai.local/v1")
+    monkeypatch.setenv("DOJO_REVIEWER_BASE_URL", "http://old.local/v1")
+    monkeypatch.setenv("DOJO_REVIEWER_MODEL", "old-model")
+    monkeypatch.setenv("DOJO_REVIEWER_TIMEOUT_SECONDS", "1")
 
-    assert isinstance(reviewer, OpenAICompatibleReviewer)
-    assert reviewer.settings.api_key == "key"
+    model = model_from_environment()
+
+    assert model is not None
+    assert model.settings.api_key == "dojo-key"
+    assert model.settings.base_url == "http://config.local/v1"
+    assert model.settings.model == "config-model"
+    assert model.settings.timeout_seconds == DEFAULT_TIMEOUT_SECONDS
+
+
+def test_malformed_settings_is_a_config_error(tmp_path: Path) -> None:
+    _write_settings(tmp_path, "[llm\n")
+
+    with pytest.raises(ConfigError, match="invalid TOML"):
+        model_from_environment(_env(tmp_path))
+
+
+def test_unknown_provider_is_a_config_error(tmp_path: Path) -> None:
+    _write_settings(tmp_path, '[llm]\nprovider = "unknown"\nmodel = "config-model"\n')
+
+    with pytest.raises(ModelConfigError, match="unknown"):
+        model_from_environment(_env(tmp_path))
+
+
+def test_the_configured_model_path_is_exercised_with_a_mock_transport(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_settings(
+        tmp_path,
+        '[llm]\nprovider = "openai"\nmodel = "config-model"\nbase_url = "http://model.local/v1"\n',
+    )
+    transport = RecordingTransport(_envelope(_review_json()))
+    monkeypatch.setattr(model_module, "_urllib_transport", transport)
+
+    model = model_from_environment(_env(tmp_path))
+    assert model is not None
+    result = model.review("system rubric", "user context")
+
+    assert result.summary == "Model summary"
+    assert len(transport.calls) == 1
+    assert transport.calls[0][0] == "http://model.local/v1/chat/completions"
 
 
 def test_review_posts_one_openai_chat_completions_request() -> None:
@@ -146,6 +291,30 @@ def test_review_posts_one_openai_chat_completions_request() -> None:
     ]
 
 
+def test_review_posts_one_anthropic_messages_request() -> None:
+    transport = RecordingTransport(_anthropic_envelope(_review_json()))
+    settings = _settings(provider="anthropic", base_url="https://api.anthropic.com")
+    reviewer = AnthropicReviewer(settings, transport)
+
+    result = reviewer.review("system rubric", "user context")
+
+    assert result.summary == "Model summary"
+    assert result.quality is None
+
+    assert len(transport.calls) == 1
+    url, headers, body, timeout = transport.calls[0]
+    assert url == "https://api.anthropic.com/v1/messages"
+    assert headers["x-api-key"] == "secret"
+    assert headers["anthropic-version"] == ANTHROPIC_VERSION
+    assert timeout == 5.0
+    payload = json.loads(body)
+    assert payload["model"] == "test-model"
+    assert payload["system"] == "system rubric"
+    assert payload["temperature"] == 0
+    assert payload["max_tokens"] == 4096
+    assert payload["messages"] == [{"role": "user", "content": "user context"}]
+
+
 def test_transport_failure_is_model_unavailable() -> None:
     reviewer = OpenAICompatibleReviewer(_settings(), FailingTransport())
 
@@ -169,6 +338,16 @@ def test_response_without_choices_is_model_unavailable() -> None:
 
 def test_empty_model_message_is_model_unavailable() -> None:
     reviewer = OpenAICompatibleReviewer(_settings(), RecordingTransport(_envelope("  ")))
+
+    with pytest.raises(ModelUnavailable, match="empty message"):
+        reviewer.review("system", "user")
+
+
+def test_anthropic_response_without_text_is_model_unavailable() -> None:
+    reviewer = AnthropicReviewer(
+        _settings(provider="anthropic"),
+        RecordingTransport('{"content": [{"type": "tool_use", "input": {}}]}'),
+    )
 
     with pytest.raises(ModelUnavailable, match="empty message"):
         reviewer.review("system", "user")
