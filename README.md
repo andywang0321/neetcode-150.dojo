@@ -7,7 +7,9 @@ retired duplicates kept addressable for history, so the roadmap serves 152.
 The repository follows dojo's curriculum convention: `<curriculum-id>.dojo`.
 
 Phases P5-A (evaluator core), P5-B (content and manifest), P5-C (A2A reviewer) and P5-D
-(engine integration) are complete. The engine (phases 1-4) lives in `../rebuild`; the
+(engine integration) are complete. P6-A/B moved the engine to one provider, one
+`DOJO_API_KEY` and one `settings.toml`; P6-C moved the reviewer onto that same config and
+key; P6-D refreshed the documentation. The engine (phases 1-4) lives in `../rebuild`; the
 old curriculum and engine (`../dojo-curriculum-neetcode-150`, `../dojo`) are read-only
 reference material. See [`docs/port-plan.md`](docs/port-plan.md) for the inventory and
 mapping and [`docs/runbook.md`](docs/runbook.md) for the manual end-to-end test guide.
@@ -51,40 +53,59 @@ The manifest targets dojo `>=0.1,<1` with `assessment.v1` and `review.v1`:
   declared for the grader but deliberately not attached to item `evaluators`.
 - `[capabilities.assist/instruct/audit]` are declarative LLM prompts; `[capabilities.review]`
   is `impl = "a2a"` pointing at `[agents.reviewer]`, `http://127.0.0.1:8766/`, skill
-  `review` (the P5-C agent in `reviewer/`).
+  `review` (the P6-C agent in `reviewer/`).
 
 The reviewer sees exactly the review view — statement, submitted files, evidence, grade
 and claims — never the assessment tree, hidden cases, references or history. The review
 is advisory: it is stored with `provider = "a2a"` provenance and never changes the grade,
 card or evidence.
 
-## Start the reviewer and enrol
+## Set up, start the reviewer and enrol
+
+The engine and the reviewer share **one provider**, **one `DOJO_API_KEY`** and **one
+`settings.toml`**. The first `dojo` in a terminal runs the setup wizard (provider, optional
+base URL, the provider's default model, editor, hidden key), validates the key, writes the
+config atomically and exports `DOJO_API_KEY` in your shell rc in a marked block; the key
+never enters the settings file. `DOJO_EDITOR` overrides `[editor].command` for one shell;
+`$EDITOR` and `$VISUAL` are not read. `--no-setup`/`DOJO_NO_SETUP` skip the wizard, and a
+non-TTY run fails with an actionable message instead of prompting. The wizard exits, so
+close the terminal and open a new one.
 
 ```bash
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
 
-# terminal 1: the P5-C reviewer (dojo never starts it)
+# 1. first run: answer the wizard, then open a new terminal
+cd /Users/andywang/Projects/dojo-workspace/rebuild
+uv sync
+uv run dojo
+
+# 2. the reviewer (dojo never starts it); same config and key, no reviewer key
 cd /Users/andywang/Projects/dojo-workspace/neetcode-150.dojo
 uv sync
+unset DOJO_API_KEY          # deterministic review; omit for model prose with the one key
 uv run python -m reviewer.server
 # card: http://127.0.0.1:8766/.well-known/agent-card.json
 # skill: review
 
-# terminal 2: the engine, against isolated test data
+# 3. the engine, against isolated test data and the same one config
 cd /Users/andywang/Projects/dojo-workspace/rebuild
-uv sync
-export DOJO_DATA_DIR="$HOME/dojo-p5d/data"
-export DOJO_CONFIG_DIR="$HOME/dojo-p5d/config"
+export DOJO_DATA_DIR="$HOME/dojo-p6d/data"
+export DOJO_WORKBENCH_DIR="$HOME/dojo-p6d/workbench"
+mkdir -p "$DOJO_DATA_DIR" "$DOJO_WORKBENCH_DIR"
 uv run dojo enroll /Users/andywang/Projects/dojo-workspace/neetcode-150.dojo
 uv run dojo
 ```
 
 The reviewer is required at enrollment (the card and skill are probed). It is not
 required at submit: if it is stopped, the attempt, grade and card are recorded and
-`review unavailable` is printed. With no LLM key, `check` and `submit` still work; the
-tutor and teacher report unavailable; the mock provider needs no key.
+`review unavailable` is printed. With `provider = "mock"` (or a mock profile) `check` and
+`submit` work offline and no key is needed; a live provider without `DOJO_API_KEY` stops
+at the setup gate. The reviewer is deterministic without a key; with the one key and a
+live config it writes the prose from the same review view, and
+`[curricula."neetcode-150".reviewer].model` overrides `[llm].model` for it only.
 
-The full manual test — prerequisites, settings, sample session, tutor/teacher/hint flow,
+The full manual test — prerequisites, the first-run and key-only setup, the one
+`settings.toml`, the reviewer's two modes, a sample session, tutor/teacher/hint flow,
 progress/history, failure paths, data locations, cleanup and privacy — is in
 [`docs/runbook.md`](docs/runbook.md).
 
@@ -94,38 +115,43 @@ progress/history, failure paths, data locations, cleanup and privacy — is in
 cd /Users/andywang/Projects/dojo-workspace/neetcode-150.dojo
 export UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache
 uv sync
-uv run pytest                 # both suites: 346 (223 curriculum + 123 reviewer)
+uv run pytest                 # both suites: 373 (223 curriculum + 150 reviewer)
 uv run pytest tests           # the evaluator core and content suite: 223
-uv run pytest reviewer/tests  # the reviewer suite: 123
+uv run pytest reviewer/tests  # the reviewer suite: 150
 uv run ruff check .
 uv run ruff format --check .
 uv run ty check .
 ```
 
-The suites are offline: no network, no API key and no bound port. The engine's 493 tests
-and the reference A2A agent's 17 tests are run from `../rebuild`. `ty` excludes only the
+The curriculum and reviewer suites are offline: no network, no API key and no bound port.
+The engine's 565 tests and the reference A2A agent's 17 tests are run from `../rebuild`
+(the engine's one A2A integration test binds loopback 8765). `ty` excludes only the
 copied `content/` corpus and `src/neetcode_dojo/assessment/` (verbatim private content);
 the evaluator core, server, prompts, tests and reviewer are all type-checked.
 
-## Phase-5 result
+## Phase-5 and P6 result
 
 - **Enrollment:** the engine installs the curriculum, probes the real MCP server (all six
-  tools) and the P5-C A2A card/skill, and persists 18 topics / 157 items (152 active).
+  tools) and the P6-C A2A card/skill, and persists 18 topics / 157 items (152 active).
+- **Setup and credentials:** the first-run wizard writes one `settings.toml` and exports
+  the one `DOJO_API_KEY` in the shell rc (never the file); the reviewer reads the same
+  config and key, deterministic without a key, with no `DOJO_REVIEWER_*`/`OPENAI_*` and an
+  optional `[curricula."neetcode-150".reviewer].model` override.
 - **Representative end-to-end:** `contains_duplicate` (tests + oracle + measured
   complexity + advisory style) and `encode_and_decode_strings` (predicate checker) pass
   through `check`, `submit`, grade 3, FSRS card and the A2A review, stored as
   `reviews.agent = reviewer/review` with `ai_calls.provider = a2a`.
 - **Failure paths:** reviewer down at enrollment fails cleanly and enrols nothing;
   reviewer stopped after enrollment leaves the attempt/card intact and prints
-  `review unavailable`; no LLM key leaves practice working; a blocked audit withholds the
-  tutor answer.
+  `review unavailable`; a live provider without a key stops at the setup gate and `mock`
+  needs none; a blocked audit withholds the tutor answer.
 - **Parity:** the P5-B representative parity report shows 15/15 identical case lists,
   30/30 identical judge statuses on the ten items the old judge can decide, and 15/15
   predicate cases through the ported checker. See
   [`docs/parity-report.md`](docs/parity-report.md).
-- **Checks:** curriculum `pytest` 346, `ruff check`, `ruff format --check` and `ty check`
-  clean; engine 493 tests and the same checks clean (the only engine formatting complaint
-  is a pre-existing Markdown code block in its read-only `docs/phase-2.md`).
+- **Checks:** curriculum `pytest` 373 (223 + 150), `ruff check`, `ruff format --check` and
+  `ty check` clean; engine 565 tests and the same checks clean (the only engine formatting
+  complaint is a pre-existing Markdown code block in its read-only `docs/phase-2.md`).
 
 Requires `uv >= 0.13` and Python 3.15. The phase-6 cutover is a separate, destructive
-step and is **not** part of this repository or this runbook.
+step; this documentation gate does not run it.

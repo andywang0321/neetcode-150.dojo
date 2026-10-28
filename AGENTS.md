@@ -20,7 +20,8 @@ The curriculum owns everything subject-specific:
 - `src/neetcode_dojo/assessment/` — the private cases, oracles, references and measurement
   plans;
 - `prompts/` and `policies/` — tutor, teacher and leak-auditor prompts; the hint ladder;
-- `reviewer/` — the P5-C A2A post-solve reviewer agent (`review` skill, port 8766);
+- `reviewer/` — the P5-C/P6-C A2A post-solve reviewer agent (`review` skill, port 8766;
+  it reads the engine's one settings file and `DOJO_API_KEY`);
 - `tests/` and `reviewer/tests/` — the evaluators' and reviewer's offline tests;
 - `docs/` — the port plan, the parity report and `docs/runbook.md`, the manual end-to-end
   test guide.
@@ -40,8 +41,13 @@ workbench code lives here, not in the engine.
 ## 3. Toolchain
 
 - Python 3.15 via `uv`; `uv sync` for dependencies, `uv run` for everything.
-- `uv run pytest` runs both suites (`tests/` and `reviewer/tests/`; 346 tests today).
-  `uv run pytest tests` and `uv run pytest reviewer/tests` run one at a time.
+- `uv run pytest` runs both suites (`tests/` and `reviewer/tests/`; 373 tests today:
+  223 + 150). `uv run pytest tests` and `uv run pytest reviewer/tests` run one at a time.
+- The engine and the reviewer share one provider, one `DOJO_API_KEY` and one
+  `settings.toml` (`[llm]`, `[editor]`, `[curricula.<id>]`). The engine's first-run setup
+  writes the config and exports the key in the shell rc; the key is never in the file.
+  `DOJO_EDITOR` overrides `[editor].command` (do not read `$EDITOR`/`$VISUAL`). There is
+  no reviewer key and no `DOJO_REVIEWER_*`/provider-specific key variable.
 - `uv run ruff check .`, `uv run ruff format --check .`, `uv run ty check .`.
 - `ty` is configured in `pyproject.toml` (`[tool.ty.src]`): it excludes only the copied
   `content/` corpus and `src/neetcode_dojo/assessment/`. The evaluator core, server,
@@ -77,9 +83,11 @@ uncommitted files.
 - The manifest is validated by the engine's loader; run the engine's `dojo enroll` against
   a built tree before claiming a content package works.
 
-## 6. Phase 5 packages
+## 6. Phase 5 and P6 packages
 
-All four packages are on `main`; P5-D is the integration and runbook branch.
+All four phase-5 packages are on `main`. P6-A/B (one-provider setup), P6-C (the reviewer
+reads the same config and key) and P6-D (this documentation refresh) are the current
+phase; the phase-6 cutover is separate and destructive.
 
 | package | scope |
 |---|---|
@@ -87,6 +95,9 @@ All four packages are on `main`; P5-D is the integration and runbook branch.
 | P5-B content + manifest | the 157 items, content/checks, assessment modules, manifest, prompts, hints, tests |
 | P5-C reviewer | the NeetCode A2A reviewer agent, prompt/rubric, tests |
 | P5-D integration | engine enrollment, representative/full items, run instructions, fixes |
+| P6-A/B setup | one provider, one `DOJO_API_KEY`, one settings file, first-run wizard |
+| P6-C reviewer config | same settings/key; deterministic without a key |
+| P6-D docs | runbook, README and port-plan refresh |
 
 ## 7. Definition of done
 
