@@ -50,16 +50,20 @@ def improvements(
 def claim_improvements(
     request: ReviewRequest, analysis: Analysis, pattern: Pattern
 ) -> tuple[str, ...]:
-    """Flag a claim that the evidence or the static shape contradicts."""
+    """Flag a claim that the evidence, the pattern or the static shape contradicts."""
+    issues: list[str] = []
+    evidence = complexity_evidence(request.evidence)
+    if evidence is not None and evidence.outcome == "pass":
+        issues.extend(_looser_bound_claims(request, pattern))
     claimed = claim(request, "time")
     if claimed is None:
-        return ()
-    evidence = complexity_evidence(request.evidence)
+        return tuple(issues)
     if evidence is not None and evidence.outcome != "pass":
-        return (
+        issues.append(
             f"The stated time complexity {claimed} is not corroborated by the "
-            f"{evidence.evaluator} evidence: {evidence.summary}",
+            f"{evidence.evaluator} evidence: {evidence.summary}"
         )
+        return tuple(issues)
     if (
         "nested_loop" in analysis.constructs
         and pattern.expected_time in {"O(n)", "O(log n)"}
@@ -67,11 +71,46 @@ def claim_improvements(
     ):
         issue = first_nested(analysis)
         where = f" at {issue.path}:{issue.line}" if issue is not None else ""
-        return (
+        issues.append(
             f"The static shape shows nested iteration{where} while the claim is {claimed}; "
-            "verify the bound or make the claim precise.",
+            "verify the bound or make the claim precise."
         )
-    return ()
+    return tuple(issues)
+
+
+_BOUND_RANK = {
+    "o(1)": 1,
+    "o(logn)": 2,
+    "o(n)": 3,
+    "o(nlogn)": 4,
+    "o(n^2)": 5,
+    "o(n2)": 5,
+    "o(2^n)": 6,
+    "o(n!)": 7,
+}
+
+
+def _looser_bound_claims(request: ReviewRequest, pattern: Pattern) -> tuple[str, ...]:
+    """When the measurement passes, a claim above the pattern's bound is suspicious."""
+    issues: list[str] = []
+    for kind, expected in (("time", pattern.expected_time), ("space", pattern.expected_space)):
+        claimed = claim(request, kind)
+        if claimed is None or expected == "varies":
+            continue
+        claimed_rank = _rank(claimed)
+        expected_rank = _rank(expected)
+        if claimed_rank is not None and expected_rank is not None and claimed_rank > expected_rank:
+            issues.append(
+                f"The stated {kind} complexity {claimed} is looser than the measured/"
+                f"expected {expected}; align the claim with the code or justify the gap."
+            )
+    return tuple(issues)
+
+
+def _rank(text: str) -> int | None:
+    normalized = text.lower().replace(" ", "").replace("²", "2").replace("**", "^")
+    ranks = [rank for token, rank in _BOUND_RANK.items() if token in normalized]
+    return max(ranks) if ranks else None
 
 
 def claim(request: ReviewRequest, kind: str) -> str | None:
