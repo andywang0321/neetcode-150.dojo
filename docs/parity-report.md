@@ -1,6 +1,9 @@
 # Representative parity report — P5-B
 
-Status: content parity complete; the new-server half is pending P5-A/P5-D.
+Status: content parity complete. P5-D completed the new-server half: the engine now
+enrolls the curriculum, runs the MCP evaluator tools end to end and stores the P5-C A2A
+review (see [`port-plan.md`](port-plan.md) §7). The table below remains the P5-B record,
+produced before the P5-A evaluator core landed.
 
 This report covers the 15 representative items from `docs/port-plan.md` §§6–7:
 every evaluator shape and comparison mode in the 157-item corpus. It was produced
@@ -77,7 +80,10 @@ assessment modules:
 - `serialize-and-deserialize-binary-tree`: `_serialize_and_deserialize_binary_tree_same`,
   `_size` and `_other` (round-trip checker).
 
-## Not covered here
+## Not covered by this P5-B report
+
+The P5-D integration results are in [`port-plan.md`](port-plan.md) §7; this section lists
+only what this P5-B report did not itself cover.
 
 - The P5-A `assess.tests` MCP tool, `assess.oracle`, `assess.complexity` and
   `assess.style`; their conformance and timing belong to P5-A/P5-D.

@@ -1,6 +1,0 @@
-# The copied curriculum corpus and its private assessment modules are content, not new
-# typed package code. They are kept verbatim for parity and excluded from the type
-# checker; the evaluator core, server, tests and reviewer are all checked normally.
-# This is the branch-local equivalent of a `[tool.ty.src]` exclusion in pyproject.toml.
-[src]
-exclude = ["content", "src/neetcode_dojo/assessment"]

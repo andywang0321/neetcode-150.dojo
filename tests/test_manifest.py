@@ -69,9 +69,21 @@ EVALUATORS = {
     "tests": ("assess.tests", "machine", True),
     "oracle": ("assess.oracle", "machine", False),
     "complexity": ("assess.complexity", "measured", False),
-    "style": ("assess.style", "machine", False),
+    # Style findings are advisory: the manifest records them as judged evidence, never
+    # a machine correctness verdict. The suite's own grade policy agrees.
+    "style": ("assess.style", "judged", False),
     "variant": ("variant", "self", False),
     "grade": ("grade", "judged", False),
+}
+
+# The evaluator core's own budgets: fast evidence 60 s, the paired measurement 5 min.
+TIMEOUTS = {
+    "tests": 60,
+    "oracle": 60,
+    "complexity": 300,
+    "style": 60,
+    "variant": 60,
+    "grade": 60,
 }
 
 
@@ -200,7 +212,7 @@ def test_evaluator_declarations_mirror_the_six_tools(manifest: dict) -> None:
         assert evaluator["tool"] == tool
         assert evaluator["assurance"] == assurance
         assert evaluator["required"] is required
-        assert evaluator["timeout"] > 0
+        assert evaluator["timeout"] == TIMEOUTS[evaluator_id]
 
     referenced = Counter(reference for item in manifest["item"] for reference in item["evaluators"])
     assert set(referenced) == {"tests", "oracle", "complexity", "style"}

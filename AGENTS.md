@@ -5,24 +5,28 @@ This repository is the private **NeetCode 150 dojo curriculum**. The engine live
 (`../dojo`) are read-only reference material. Do not import the old engine, copy its
 application code into dojo, or depend on its database/history.
 
-Read `docs/port-plan.md` and the engine's `docs/phase-5.md` before starting work.
+Read `docs/port-plan.md`, the engine's `docs/phase-5.md` and `docs/runbook.md` before
+starting work.
 
 ## 1. What lives here
 
 The curriculum owns everything subject-specific:
 
-- `curriculum.toml` — topics, items, evaluators, capabilities, aliases, display words;
+- `curriculum.toml` — 18 topics, 157 items, 6 evaluators, 4 capabilities, aliases and
+  display words;
 - `content/<item>/` — statement, workspace template and visible `check.py`;
-- `neetcode_dojo/` — the private evaluator package: the local registry, judge, measurement,
-  static analysis, process isolation and the MCP server (`assessment.v1`);
-- `neetcode_dojo/assessment/` — the private cases, oracles, references and measurement plans;
-- `prompts/` and `policies/` — tutor, teacher, leak-auditor and reviewer prompts; the hint
-  ladder and leak policy;
-- `reviewer/` — the A2A post-solve reviewer agent;
-- `tests/` — the evaluators' own offline tests.
+- `src/neetcode_dojo/` — the private evaluator package: the local registry, judge,
+  measurement, static analysis, process isolation and the MCP server (`assessment.v1`);
+- `src/neetcode_dojo/assessment/` — the private cases, oracles, references and measurement
+  plans;
+- `prompts/` and `policies/` — tutor, teacher and leak-auditor prompts; the hint ladder;
+- `reviewer/` — the P5-C A2A post-solve reviewer agent (`review` skill, port 8766);
+- `tests/` and `reviewer/tests/` — the evaluators' and reviewer's offline tests;
+- `docs/` — the port plan, the parity report and `docs/runbook.md`, the manual end-to-end
+  test guide.
 
 dojo only orchestrates the tools and records evidence. The judge, measurement and
-workbench code moves here, not into the engine.
+workbench code lives here, not in the engine.
 
 ## 2. Private by construction
 
@@ -36,12 +40,18 @@ workbench code moves here, not into the engine.
 ## 3. Toolchain
 
 - Python 3.15 via `uv`; `uv sync` for dependencies, `uv run` for everything.
-- `uv run pytest`, `uv run ruff check .`, `uv run ruff format --check .`,
-  `uv run ty check .`.
+- `uv run pytest` runs both suites (`tests/` and `reviewer/tests/`; 346 tests today).
+  `uv run pytest tests` and `uv run pytest reviewer/tests` run one at a time.
+- `uv run ruff check .`, `uv run ruff format --check .`, `uv run ty check .`.
+- `ty` is configured in `pyproject.toml` (`[tool.ty.src]`): it excludes only the copied
+  `content/` corpus and `src/neetcode_dojo/assessment/`. The evaluator core, server,
+  prompts, tests and reviewer stay type-checked; do not add blanket excludes.
 - Export `UV_CACHE_DIR=/Users/andywang/Projects/dojo-workspace/.uv-cache` in the sandboxed
   workspace. Do not commit `.venv`, caches or generated files.
 - The approved dependencies are the engine's phase-5 set: `pydantic`, `mcp`, `radon`,
   `a2a-sdk[fastapi]`, `uvicorn`; no new dependency without the orchestrator.
+- The A2A reviewer is a separate process: `uv run python -m reviewer.server` from the
+  repository root. dojo never starts or stops it; the runbook covers the exact commands.
 
 ## 4. Branch protocol
 
@@ -69,6 +79,8 @@ uncommitted files.
 
 ## 6. Phase 5 packages
 
+All four packages are on `main`; P5-D is the integration and runbook branch.
+
 | package | scope |
 |---|---|
 | P5-A evaluator core | local registry, judge, measurement, static analysis, process isolation, MCP server, tests |
@@ -78,9 +90,10 @@ uncommitted files.
 
 ## 7. Definition of done
 
-- `uv run pytest`, `uv run ruff check .`, `uv run ruff format --check .` and
+- `uv run pytest` (both suites), `uv run ruff check .`, `uv run ruff format --check .` and
   `uv run ty check .` pass here.
-- The engine can enroll, practise, submit and review a representative set, then the full
-  corpus, without a network except the local reference/A2A agent.
-- The run instructions are written for a human to test the rebuild end to end.
+- The engine enrolls the curriculum (MCP tools and A2A card/skill probes), practises,
+  submits and reviews the representative items, and lists the full corpus, without a
+  network except the local A2A reviewer and the loopback MCP server.
+- `docs/runbook.md` is a complete manual test guide a human can follow end to end.
 - No private assessment material leaked into a prompt or a student-visible path.
