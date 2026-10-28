@@ -731,6 +731,53 @@ deliberately not attached to items in P5. `complexity` and `style` remain adviso
 evidence; a partial measured reading shows up in the evidence and the review without
 silently changing the grade.
 
+### 8.1 Discussion, polish and `dojo show`
+
+After the review, the session stays open in **discussion** mode. Ask the reviewer
+follow-ups (no hint ladder, no leak audit); `polish` returns to the editor with the same
+reviewer agent; `submit` records another attempt; `done` ends the session. The whole
+conversation and every snapshot are saved.
+
+```text
+dojo> why does the set make membership O(1)?
+╭─────────────────────────── reviewer · discussion ────────────────────────────╮
+│ ... review-aware answer ...                                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+dojo> polish
+╭───────────────────────────────── polishing ──────────────────────────────────╮
+│ Polish mode: edit solution.py, `check`, then `submit` ...                    │
+╰──────────────────────────────────────────────────────────────────────────────╯
+open · check · submit · done · statement · help
+dojo> open
+dojo> submit
+... evidence and review for revision 2 ...
+dojo> done
+╭──────────────────────────────────── done ────────────────────────────────────╮
+│ Session complete.                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+```
+
+`dojo history` now shows numbered attempts (default: the last 5; `dojo history 20` or
+`dojo history all` for more), with a `#` column. Use `dojo show 1` for the most recent
+attempt, `dojo show 2` for the one before it, and so on:
+
+```bash
+uv run dojo show 1
+```
+
+```text
+╭────────────────────────────────── attempt ───────────────────────────────────╮
+│ attempt #1 · Contains Duplicate                                              │
+│ grade: 3 (pass)                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+... solution.py, evidence, claims, review, conversation and snapshot timeline ...
+```
+
+`show` reads the entire saved attempt: solution files, evidence, claims, review,
+conversation and the snapshot timeline. The snapshot list records when the working solution
+was captured (session start, each submit, polish entry, and before each solve/polish
+question).
+
 ## 9. Tutor, teacher, hints and `learn` / `practice`
 
 Do this in a session **before** its submit (section 8), or in a fresh profile: after a
@@ -1057,7 +1104,7 @@ From the engine checkout (read-only for P6-D):
 
 ```bash
 cd "$ENGINE"
-uv run pytest                 # 588
+uv run pytest                 # 593
 uv run ruff check .           # clean
 uv run ty check .             # clean
 uv run ruff format --check .  # see the known-issue note below
@@ -1239,7 +1286,7 @@ Privacy and the data boundary:
   command again and the review is produced.
 - With a live provider and no key, the CLI stops actionably; with `mock` the whole flow is
   offline; with no key the reviewer is deterministic.
-- The curriculum suite is 375 (224 + 151), `ruff` and `ty` are clean; the engine is 588
+- The curriculum suite is 375 (224 + 151), `ruff` and `ty` are clean; the engine is 593
   and clean apart from the pre-existing `docs/phase-2.md` formatting note; the reference
   agent is 17.
 - No private material appears in any prompt, workspace, review request or committed file.

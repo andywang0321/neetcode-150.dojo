@@ -1931,6 +1931,11 @@ impl = "a2a"
 agent = "reviewer"
 skill = "review"
 
+[capabilities.discuss]
+impl = "llm"
+prompt = "prompts/discussion.md"
+model = "reviewer"
+
 [aliases]
 # The old curriculum's ids are the new ids; no rename is implied.
 topics = {}
