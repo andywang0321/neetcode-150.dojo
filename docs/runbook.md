@@ -1040,7 +1040,7 @@ From the engine checkout (read-only for P6-D):
 
 ```bash
 cd "$ENGINE"
-uv run pytest                 # 579
+uv run pytest                 # 580
 uv run ruff check .           # clean
 uv run ty check .             # clean
 uv run ruff format --check .  # see the known-issue note below
@@ -1222,7 +1222,7 @@ Privacy and the data boundary:
   command again and the review is produced.
 - With a live provider and no key, the CLI stops actionably; with `mock` the whole flow is
   offline; with no key the reviewer is deterministic.
-- The curriculum suite is 373 (223 + 150), `ruff` and `ty` are clean; the engine is 579
+- The curriculum suite is 373 (223 + 150), `ruff` and `ty` are clean; the engine is 580
   and clean apart from the pre-existing `docs/phase-2.md` formatting note; the reference
   agent is 17.
 - No private material appears in any prompt, workspace, review request or committed file.
