@@ -2,7 +2,7 @@
 
 No network, no real home directory, no old-engine import: the old judge is reached only
 through the parity test's subprocess driver. The manifest is validated by the engine's own
-loader when a checkout is available (`DOJO_ENGINE`, or the rebuild checkout beside this
+loader when a checkout is available (`DOJO_ENGINE`, or the dojo checkout beside this
 workspace); the content/private-tree tests are this repository's own gates.
 """
 
@@ -28,16 +28,11 @@ from tests.support import make_evaluators
 #: The curriculum root: the directory holding `curriculum.toml`.
 ROOT = Path(__file__).resolve().parents[1]
 
-#: The read-only old curriculum and engine, used only by the parity report.
-OLD_CURRICULUM = Path(
-    os.environ.get(
-        "OLD_CURRICULUM",
-        "/Users/andywang/Projects/dojo-workspace/dojo-curriculum-neetcode-150",
-    )
-).expanduser()
-OLD_ENGINE = Path(
-    os.environ.get("OLD_ENGINE", "/Users/andywang/Projects/dojo-workspace/dojo")
-).expanduser()
+#: Optional archived old curriculum/engine, used only by the manual parity tests.
+_OLD_CURRICULUM = os.environ.get("OLD_CURRICULUM")
+_OLD_ENGINE = os.environ.get("OLD_ENGINE")
+OLD_CURRICULUM = Path(_OLD_CURRICULUM).expanduser() if _OLD_CURRICULUM else None
+OLD_ENGINE = Path(_OLD_ENGINE).expanduser() if _OLD_ENGINE else None
 
 #: Registry decorators injected into a measured module's namespace by the probe
 #: harness; the synthetic measurement must inject the same set.
@@ -61,7 +56,10 @@ def _engine_candidates() -> list[Path]:
         candidates.append(Path(configured).expanduser())
     candidates.extend(
         (
-            Path("/Users/andywang/Projects/dojo-workspace/rebuild"),
+            ROOT.parent / "dojo",
+            ROOT.parents[1] / "dojo",
+            ROOT.parents[2] / "dojo",
+            # Legacy layout, kept so an old worktree can still validate the manifest.
             ROOT.parent / "rebuild",
             ROOT.parents[1] / "rebuild",
             ROOT.parents[2] / "rebuild",
@@ -79,14 +77,14 @@ def engine_root() -> Path | None:
 
 
 def old_engine_root() -> Path | None:
-    """The read-only old engine, used only to prove parity of the copied corpus."""
-    if (OLD_ENGINE / "src" / "dojo" / "judge" / "runner.py").is_file():
+    """The archived old engine, if the manual parity environment points at one."""
+    if OLD_ENGINE is not None and (OLD_ENGINE / "src" / "dojo" / "judge" / "runner.py").is_file():
         return OLD_ENGINE.resolve()
     return None
 
 
 def old_curriculum_root() -> Path | None:
-    if (OLD_CURRICULUM / "curriculum.toml").is_file():
+    if OLD_CURRICULUM is not None and (OLD_CURRICULUM / "curriculum.toml").is_file():
         return OLD_CURRICULUM.resolve()
     return None
 
