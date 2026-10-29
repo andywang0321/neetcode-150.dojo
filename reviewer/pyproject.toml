@@ -1,5 +1,5 @@
 # Configuration for the embedded reviewer project. It deliberately has no [project]
-# table and no lockfile: the reviewer runs in the repository's phase-5 uv environment.
+# table and no lockfile: the reviewer runs in the repository's uv environment.
 # Start it from the repository root: `uv run python -m reviewer.server`.
 [tool.pytest.ini_options]
 testpaths = ["tests"]

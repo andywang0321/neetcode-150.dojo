@@ -34,7 +34,7 @@ The process stays in the foreground; stop it with Ctrl-C. It serves:
 | A2A JSON-RPC | `POST http://127.0.0.1:8766/` (protocol v1.0, `JSONRPC` binding, `SendMessage`) |
 | skill id | `review` |
 
-This is the contract P5-B's manifest already declares:
+This is the contract the curriculum manifest declares:
 
 ```toml
 [agents.reviewer]
@@ -296,10 +296,10 @@ engine's reference agent, so it never depends on the engine package or its datab
   broader picture) but the new contract has no per-dimension scores: they become
   findings, and `quality` is the single advisory float.
 - The rubric lives in `reviewer/prompt.py` with the A2A project, not in
-  `prompts/reviewer.md`; P5-B owns the curriculum's LLM-fallback prompt file and is free
-  to reuse or replace it without touching the A2A agent.
-- The card/skill/URL contract is P5-B's manifest; this project does not edit the
-  manifest.
+  `prompts/reviewer.md`; the curriculum's LLM-fallback prompt is separate and can be
+  changed without touching the A2A agent.
+- The card/skill/URL contract lives in the curriculum manifest; this project does not
+  edit the manifest.
 - Non-goals: no authentication, streaming, push notifications, task lifecycle, code
-  execution or remote service. The reviewer is local-only, like the engine's phase-4
-  reference agent.
+  execution or remote service. The reviewer is local-only, like the engine's reference
+  A2A agent.
